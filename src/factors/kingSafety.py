@@ -8,13 +8,15 @@ logger = logging.getLogger(__name__)
 
 def kingSafety(board, side):
     """
+    @brief
     Calculates a representing value for the safety the king currently has on the field.
 
+    @details
     It adds points for a pawn shield (pawns in front of the king), if the king or spaces in front of him are attacked and how often
     and if the king has been castled.
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of king safety
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of king safety
     """
 
     logger.debug("Calculating king safety")

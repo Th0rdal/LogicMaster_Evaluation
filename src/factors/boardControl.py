@@ -6,12 +6,15 @@ logger = logging.getLogger(__name__)
 
 def boardControl(board, side):
     """
+    @brief
     Calculates a representational value of the board control for the given side on the board.
 
+    @details
     Calculating if a queen or rook was on an open rank, a bishop or queen on an open diagonal and if the central square is attacked
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of board control
+
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of board control
     """
 
     logger.debug("Calculating board control")

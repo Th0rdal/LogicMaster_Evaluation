@@ -6,6 +6,16 @@ from src.factors.util import otherSide
 logger = logging.getLogger(__name__)
 
 def pawnDynamics(board, side):
+    """
+    @brief
+    Calculates a representational value for the pawn dynamics for a given side of the board.
+
+    @details
+    Calculating the pawn break and pawn structure scores.
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of pawn dynamics
+    """
     logger.debug("Calculating pawn dynamics")
 
     pawnBreakScore = 0

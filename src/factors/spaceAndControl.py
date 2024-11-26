@@ -6,12 +6,14 @@ logger = logging.getLogger(__name__)
 
 def spaceAndControl(board, side):
     """
+    @brief
     Calculates a representing value for the space and control the chosen side currently has on the board.
 
+    @details
     It adds points for space advantage and for zugzwang.
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of space and control
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of space and control
     """
 
     logger.debug("Calculating space and control")

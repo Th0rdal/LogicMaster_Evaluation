@@ -8,12 +8,13 @@ logger = logging.getLogger(__name__)
 
 def endgameConsiderations(board, side):
     """
+    @brief
     Calculates a representational value of the endgame considerations for the given side on the board.
 
     Calculating the activity score (for the king) and the simplification possibilities.
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of piece activity
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of piece activity
     """
 
     logger.debug("Calculating endgame considerations")

@@ -1,5 +1,3 @@
-from functools import total_ordering
-
 import chess
 import logging
 from globals import strongThreatBonusValue, mediumThreatBonusValue, weakThreatBonusValue
@@ -7,12 +5,15 @@ logger = logging.getLogger(__name__)
 
 def threats(board, side):
     """
+    @brief
     Calculating a representational value of threats for a given side of the board.
 
+    @details
     Calculating the threat score (looking at possible captures of the enemy).
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of threats
+
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of threats
     """
 
     logger.debug("Calculating threats and counter threats")

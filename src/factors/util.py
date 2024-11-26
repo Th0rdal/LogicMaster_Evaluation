@@ -15,12 +15,14 @@ def otherSide(side):
 
 def getGamestatus(board):
     """
+    @brief
     Calculates in what status the game currently is.
 
+    @details
     It only differentiates between Opening and Endgame with Endgame defined as both players having less material than
     defined in globals maxMaterialValueEngame.
-    :param board: The board to use for calculations
-    :return: Gamestatus enum representing the current game status
+    @param board: The board to use for calculations
+    @return: Gamestatus enum representing the current game status
     """
 
     material = calculateMaterialTotal(board)
@@ -30,10 +32,11 @@ def getGamestatus(board):
 
 def calculateMaterialTotal(board):
     """
+    @brief
     Calculates the total value of all pieces combined of both players.
 
-    :param board: The board to use for the calculations
-    :return: Dictionary with chess.WHITE and chess.BLACK as keys and the total value as value
+    @param board: The board to use for the calculations
+    @return: Dictionary with chess.WHITE and chess.BLACK as keys and the total value as value
     """
     material = {chess.WHITE: 0, chess.BLACK: 0}
     for pieceType in pieceValues:

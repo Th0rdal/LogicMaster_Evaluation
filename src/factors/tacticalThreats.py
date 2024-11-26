@@ -7,12 +7,14 @@ logger = logging.getLogger(__name__)
 
 def tacticalThreats(board, side):
     """
+    @brief
     Calculates a representational value of tactical threats the given side has on the board.
 
+    @details
     Calculates fork score, pin score and skewer score for the side given as parameter
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of tactical threats
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of tactical threats
     """
 
     logger.debug("Calculating tactical threats")

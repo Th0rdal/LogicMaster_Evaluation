@@ -7,14 +7,16 @@ logger = logging.getLogger(__name__)
 
 def calculatedMaterialImbalance(board):
     """
+    @brief
     Calculates the material imbalance of the board that is given.
 
+    @details
     It uses the pieceValues defined in globals and calculates the total value of all white and black pieces and then
     subtracts the black piece value from the white one. The result will be positive if white has a higher value than
     black. A negative value means that black has a higher total piece value
 
-    :param board: The board to use for the calculations
-    :return: The total value of all white pieces minus the total value of all black pieces
+    @param board: The board to use for the calculations
+    @return: The total value of all white pieces minus the total value of all black pieces
     """
     logger.debug("Calculating material imbalance")
 

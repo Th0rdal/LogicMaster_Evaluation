@@ -7,6 +7,16 @@ from src.factors.util import otherSide
 logger = logging.getLogger(__name__)
 
 def pieceExchange(board, side):
+    """
+    @brief
+    Calculates a representational value of the piece exchange for the given side of the board.
+
+    @details
+    Calculating the piece exchange score and piece sacrifice score.
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of piece exchange
+    """
     logger.debug("Calculating piece exchanges")
 
     exchangeScore = 0

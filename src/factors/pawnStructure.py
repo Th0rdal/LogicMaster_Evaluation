@@ -7,12 +7,14 @@ logger = logging.getLogger(__name__)
 
 def pawnStructure(board, side):
     """
-    Calculates a representing value for the pawn structure
+    @brief
+    Calculates a representing value for the pawn structure for the given side of the board.
 
-    Calculates isolated pawn, double pawn and backward pawn penalty as well as passed pawn and pawn chain boni.
-    :param board: The board to use for the calculations
-    :param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
-    :return: Total value of pawn structure
+    @details
+    Calculating isolated pawn, double pawn and backward pawn penalty as well as passed pawn and pawn chain boni.
+    @param board: The board to use for the calculations
+    @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
+    @return: Total value of pawn structure
     """
 
     logger.debug("Calculating pawn structure")
