@@ -1,0 +1,64 @@
+# Doxygen configuration file
+
+# Project information
+PROJECT_NAME           = "LogicMaster Evaluation"
+PROJECT_NUMBER         = "1.0"
+PROJECT_BRIEF          = "Ba2 project comparing 3 different algorithms for adjusting values to fit stockfish evaluation."
+OUTPUT_DIRECTORY       = ./docu
+
+# Input settings
+INPUT                  = ./src
+FILE_PATTERNS          = *.py
+RECURSIVE              = YES
+
+# Exclude specific files or directories
+EXCLUDE                =
+
+# Build configuration
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+
+# Set whether Doxygen will document undocumented members
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+# Source browsing
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+
+# HTML output
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+
+# LaTeX output
+GENERATE_LATEX         = NO
+
+# Other settings
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+GENERATE_PERLMOD       = NO
+GENERATE_DOCSET        = NO
+
+# Python-specific settings
+EXTENSION_MAPPING      = py=Python
+
+# Options for the AUTO_GEN_DOC feature
+AUTOBRIEF              = YES
+
+# Preprocessor settings
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = NO
+EXPAND_ONLY_PREDEF     = NO
+
+# Expert settings
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
