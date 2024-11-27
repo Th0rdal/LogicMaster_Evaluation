@@ -19,14 +19,14 @@ def kingSafety(board, side):
     @return: Total value of king safety
     """
 
-    logger.debug("Calculating king safety")
+    logger.info("Calculating king safety")
 
     kingSquare = board.king(side)
     kingFile = chess.square_file(kingSquare)
     pawnShield = 0
     exposedPenaltyTotal = 0
 
-    logger.debug(f"The king safety side chosen was {side}")
+    logger.info(f"The king safety side chosen was {side}")
 
     for offset in [-1, 0, 1]:
         if 0 <= kingFile + offset <= 7:
@@ -37,19 +37,19 @@ def kingSafety(board, side):
                 if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
                     exposedPenaltyTotal += exposedKingPenaltyValue
     pawnShield = pawnShield if getGamestatus(board) != Gamestatus.ENDGAME else 0
-    logger.debug(f"The king safety pawn shield value is {pawnShield}.")
+    logger.info(f"The king safety pawn shield value is {pawnShield}.")
 
     for attackSquare in board.attacks(kingSquare):
         if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
             exposedPenaltyTotal += exposedKingPenaltyValue
 
-    logger.debug(f"The king safety exposed penalty total is {exposedPenaltyTotal}.")
+    logger.info(f"The king safety exposed penalty total is {exposedPenaltyTotal}.")
 
     castlingBonus = notCastledPenaltyValue if board.has_castling_rights(side) else castledBonusValue
     castlingBonus = castlingBonus if getGamestatus(board) != Gamestatus.ENDGAME else 0
-    logger.debug(f"The king safety castling bonus is {castlingBonus}.")
+    logger.info(f"The king safety castling bonus is {castlingBonus}.")
 
     totalValue = pawnShield - exposedPenaltyTotal + castlingBonus
-    logger.debug(f"The king safety total value is {totalValue}.")
+    logger.info(f"The king safety total value is {totalValue}.")
 
     return totalValue

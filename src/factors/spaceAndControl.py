@@ -16,7 +16,7 @@ def spaceAndControl(board, side):
     @return: Total value of space and control
     """
 
-    logger.debug("Calculating space and control")
+    logger.info("Calculating space and control")
 
     zugzwang = 0
 
@@ -31,7 +31,7 @@ def spaceAndControl(board, side):
 
     spaceAdvantage = len(whiteControl) - len(blackControl) if side == chess.WHITE else len(blackControl) - len(whiteControl)
     spaceScore = spaceAdvantage * spaceAdvantageMultiplierBonusValue
-    logger.debug(f"The space and control space score value is {spaceScore}.")
+    logger.info(f"The space and control space score value is {spaceScore}.")
 
     opponentMoves = list(board.legal_moves)
     worstOutcomes = 0
@@ -43,8 +43,8 @@ def spaceAndControl(board, side):
         board.pop()
     if worstOutcomes == len(opponentMoves):
         zugzwang += zugzwangBonusValue
-    logger.debug(f"The space and control zugzwang value is {zugzwang}.")
+    logger.info(f"The space and control zugzwang value is {zugzwang}.")
 
     totalValue = spaceScore + zugzwang
-    logger.debug(f"The space and control total value is {totalValue}.")
+    logger.info(f"The space and control total value is {totalValue}.")
     return totalValue

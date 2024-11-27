@@ -15,7 +15,7 @@ def pawnDynamics(board, side):
     @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
     @return: Total value of pawn dynamics
     """
-    logger.debug("Calculating pawn dynamics")
+    logger.info("Calculating pawn dynamics")
 
     pawnBreakScore = 0
     structureScore = 0
@@ -29,8 +29,8 @@ def pawnDynamics(board, side):
                 pawnBreakScore += pawnBreakWithKingExposureBonusValue
             board.pop()
 
-    logger.debug(f"The pawn dynamics structure score value is {structureScore}.")
+    logger.info(f"The pawn dynamics structure score value is {structureScore}.")
 
     totalValue = 0
-    logger.debug(f"The pawn dynamics total value is {totalValue}.")
+    logger.info(f"The pawn dynamics total value is {totalValue}.")
     return totalValue

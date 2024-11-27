@@ -17,7 +17,7 @@ def pawnStructure(board, side):
     @return: Total value of pawn structure
     """
 
-    logger.debug("Calculating pawn structure")
+    logger.info("Calculating pawn structure")
 
     # isolated pawns
     isolatedPenalty = 0
@@ -26,7 +26,7 @@ def pawnStructure(board, side):
         # Check if adjacent files are empty of friendly pawns
         if not any(board.pieces(chess.PAWN, side) & chess.BB_FILES[file + offset] for offset in [-1, 1] if 0 <= file + offset <= 7):
             isolatedPenalty -= isolatedPawnPenaltyValue
-    logger.debug(f"The pawn structure isolated penalty is {isolatedPenalty}.")
+    logger.info(f"The pawn structure isolated penalty is {isolatedPenalty}.")
 
     # double pawns
     doubledPawnPenalty = 0
@@ -34,7 +34,7 @@ def pawnStructure(board, side):
         pawnsOnFile = sum(1 for square in chess.BB_FILES[file] if board.piece_at(square) == chess.Piece(chess.PAWN, side))
         if pawnsOnFile > 1:
             doubledPawnPenalty += doublePawnPenaltyValue
-    logger.debug(f"The pawn structure double pawn penalty is {doubledPawnPenalty}.")
+    logger.info(f"The pawn structure double pawn penalty is {doubledPawnPenalty}.")
 
     # backwards pawns
     backwardPawnPenalty = 0
@@ -43,7 +43,7 @@ def pawnStructure(board, side):
         if not any (board.pieces(chess.PAWN, side) & chess.BB_FILES[file + offset] for offset in [-1, 1] if 0 <= file + offset <= 7):
             if board.piece_at(chess.square(file, chess.square_rank(pawnSquare) + 1)) is not None:
                 backwardPawnPenalty += backwardPawnPenaltyValue
-    logger.debug(f"The pawn structure backwards pawn penalty is {backwardPawnPenalty}.")
+    logger.info(f"The pawn structure backwards pawn penalty is {backwardPawnPenalty}.")
 
     # passed pawn
     passedPawnBonus = 0
@@ -55,7 +55,7 @@ def pawnStructure(board, side):
             passedPawnBonus += passedPawnBonusValue
             if rank >= 4:  # Advanced pawn
                 passedPawnBonus += advancedPassedPawnBonusValue
-    logger.debug(f"The pawn structure passed pawn bonus is {passedPawnBonus}.")
+    logger.info(f"The pawn structure passed pawn bonus is {passedPawnBonus}.")
 
     # pawn chains
     chainBonus = 0
@@ -75,8 +75,8 @@ def pawnStructure(board, side):
             else:
                 break
         chainBonus += chainLength * chainLengthMultiplierBonusValue
-    logger.debug(f"The pawn structure chain bonus is {chainBonus}.")
+    logger.info(f"The pawn structure chain bonus is {chainBonus}.")
 
     totalValue = (passedPawnBonus + chainBonus) - (isolatedPenalty + doubledPawnPenalty + backwardPawnPenalty)
-    logger.debug(f"The total pawn structure value is {totalValue}.")
+    logger.info(f"The total pawn structure value is {totalValue}.")
     return totalValue

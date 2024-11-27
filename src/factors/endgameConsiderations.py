@@ -17,7 +17,7 @@ def endgameConsiderations(board, side):
     @return: Total value of piece activity
     """
 
-    logger.debug("Calculating endgame considerations")
+    logger.info("Calculating endgame considerations")
 
     if getGamestatus(board) == Gamestatus.ENDGAME:
         return 0
@@ -32,7 +32,7 @@ def endgameConsiderations(board, side):
         for pawnSquare in board.pieces(chess.PAWN, side):
             if chess.square_distance(kingSquare, pawnSquare) <= 1:
                 activityScore += pawnKingproximityBonusValue
-    logger.debug(f"The endgame consideration activity score is {activityScore}.")
+    logger.info(f"The endgame consideration activity score is {activityScore}.")
 
     # simplification
     for move in board.legal_moves:
@@ -51,8 +51,8 @@ def endgameConsiderations(board, side):
                     simplificationScore += neutralExchangeBonusValue
 
         board.pop()
-    logger.debug(f"The endgame consideration simplification score value is {activityScore}.")
+    logger.info(f"The endgame consideration simplification score value is {activityScore}.")
 
     totalValue = activityScore + simplificationScore
-    logger.debug(f"The total endgame consideration score is {totalValue}.")
+    logger.info(f"The total endgame consideration score is {totalValue}.")
     return totalValue

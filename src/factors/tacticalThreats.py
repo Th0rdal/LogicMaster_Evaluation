@@ -17,7 +17,7 @@ def tacticalThreats(board, side):
     @return: Total value of tactical threats
     """
 
-    logger.debug("Calculating tactical threats")
+    logger.info("Calculating tactical threats")
 
     # fork
     forkScore = 0
@@ -28,7 +28,7 @@ def tacticalThreats(board, side):
         valuablePieces = [p for p in attackedPieces if p.piece_type in [chess.ROOK, chess.QUEEN, chess.KING]]
         if len(valuablePieces) > 1:
             forkScore += forkBonusValue
-    logger.debug(f"The tactical threats fork score value is {forkScore}.")
+    logger.info(f"The tactical threats fork score value is {forkScore}.")
 
     # pins
     pinScore = 0
@@ -40,7 +40,7 @@ def tacticalThreats(board, side):
                     for behindSquare in board.attacks(targetSquare):
                         if board.piece_at(behindSquare) and board.piece_at(behindSquare).color == otherSide(side):
                             pinScore += pinBonusValue
-    logger.debug(f"The tactical threats pin score value is {pinScore}.")
+    logger.info(f"The tactical threats pin score value is {pinScore}.")
 
     # skewers
     skewerScore = 0
@@ -50,8 +50,8 @@ def tacticalThreats(board, side):
                 for behindSquare in board.attacks(targetSquare):
                     if board.piece_at(behindSquare) and board.piece_at(behindSquare).color == otherSide(side):
                         skewerScore += skewerBonusValue
-    logger.debug(f"The tactical threats skewer score value is {skewerScore}.")
+    logger.info(f"The tactical threats skewer score value is {skewerScore}.")
 
     totalValue = forkScore + pinScore + skewerScore
-    logger.debug(f"The total tactical threats value is {totalValue}")
+    logger.info(f"The total tactical threats value is {totalValue}")
     return totalValue

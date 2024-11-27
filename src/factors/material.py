@@ -18,10 +18,10 @@ def calculatedMaterialImbalance(board):
     @param board: The board to use for the calculations
     @return: The total value of all white pieces minus the total value of all black pieces
     """
-    logger.debug("Calculating material imbalance")
+    logger.info("Calculating material imbalance")
 
     material = calculateMaterialTotal(board)
 
-    logger.debug(f"The total material value of white is {material['WHITE']}")
-    logger.debug(f"The total material value of black is {material['BLACK']}")
+    logger.info(f"The total material value of white is {material['WHITE']}")
+    logger.info(f"The total material value of black is {material['BLACK']}")
     return material[chess.WHITE] - material[chess.BLACK]

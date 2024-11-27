@@ -17,7 +17,7 @@ def boardControl(board, side):
     @return: Total value of board control
     """
 
-    logger.debug("Calculating board control")
+    logger.info("Calculating board control")
 
     fileScore = 0
     diagonalScore = 0
@@ -32,7 +32,7 @@ def boardControl(board, side):
             fileScore += openFileBonusValue
         elif not whitePawns:
             fileScore += semiOpenBonusValue
-    logger.debug(f"The board control file score value is {fileScore}.")
+    logger.info(f"The board control file score value is {fileScore}.")
 
     for pieceSquares in board.pieces(chess.BISHOP, side) | board.pieces(chess.QUEEN, side):
         isOpen = True
@@ -42,13 +42,13 @@ def boardControl(board, side):
                 break
         if isOpen:
             diagonalScore += openDiagonalBonusValue
-    logger.debug(f"The board control diagonal score value is {diagonalScore}.")
+    logger.info(f"The board control diagonal score value is {diagonalScore}.")
 
     for square in centerSquares:
         if board.is_attacked_by(side, square):
             centralSquaresAttackedScore += centralSquareAttackedBonusValue
-    logger.debug(f"The board control central control score value is {centralSquaresAttackedScore}.")
+    logger.info(f"The board control central control score value is {centralSquaresAttackedScore}.")
 
     totalValue = fileScore + diagonalScore + centralSquaresAttackedScore
-    logger.debug(f"The board control total value is {totalValue}.")
+    logger.info(f"The board control total value is {totalValue}.")
     return totalValue
