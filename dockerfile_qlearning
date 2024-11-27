@@ -1,0 +1,19 @@
+# Base Python image
+FROM python:3.9-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy your source code into the container
+COPY src/ ./src
+
+# Copy training and testing data into the container
+COPY resources/training /app/resources/training
+COPY resources/testing /app/resources/testing
+
+# Install Python dependencies if you have a requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Command to run your Python AI program
+#CMD ["python", "src/your_ai_program.py"]
