@@ -1,7 +1,8 @@
 import chess
 from enum import Enum
 
-from src.factors.globals import pieceValues, maxMaterialValueEndgame
+from src.params import maxMaterialValueEndgame
+from src.globals import PIECE_VALUE
 
 
 class Gamestatus(Enum):
@@ -39,7 +40,7 @@ def calculateMaterialTotal(board):
     @return: Dictionary with chess.WHITE and chess.BLACK as keys and the total value as value
     """
     material = {chess.WHITE: 0, chess.BLACK: 0}
-    for pieceType in pieceValues:
-        material[chess.WHITE] += len(board.pieces(pieceType, chess.WHITE)) * pieceValues[pieceType]
-        material[chess.BLACK] += len(board.pieces(pieceType, chess.BLACK)) * pieceValues[pieceType]
+    for pieceType in PIECE_VALUE:
+        material[chess.WHITE] += len(board.pieces(pieceType, chess.WHITE)) * PIECE_VALUE[pieceType]
+        material[chess.BLACK] += len(board.pieces(pieceType, chess.BLACK)) * PIECE_VALUE[pieceType]
     return material

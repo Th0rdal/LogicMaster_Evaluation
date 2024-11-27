@@ -1,6 +1,6 @@
 import chess
 import logging
-from globals import forkBonusValue, pinBonusValue, skewerBonusValue
+from src.params import forkBonusValue, pinBonusValue, skewerBonusValue
 from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)

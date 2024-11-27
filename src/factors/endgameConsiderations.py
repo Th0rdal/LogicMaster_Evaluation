@@ -1,8 +1,8 @@
 import chess
 import logging
-from globals import kingCenterEndgameBonusValue, pawnKingproximityBonusValue, winningExchangeBonusValue, neutralExchangeBonusValue
-from src.factors.globals import centerSquares
-from src.factors.util import otherSide, calculateMaterialTotal, getGamestatus, Gamestatus
+from src.params import kingCenterEndgameBonusValue, pawnKingproximityBonusValue, winningExchangeBonusValue, neutralExchangeBonusValue
+from src.globals import CENTER_SQUARE
+from src.factors.util import otherSide, getGamestatus, Gamestatus
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def endgameConsiderations(board, side):
     simplificationScore = 0
     if len(list(board.pieces(chess.QUEEN, otherSide(side)))) == 0:
         kingSquare = board.king(side)
-        if kingSquare in centerSquares:
+        if kingSquare in CENTER_SQUARE:
             activityScore += kingCenterEndgameBonusValue
 
         for pawnSquare in board.pieces(chess.PAWN, side):

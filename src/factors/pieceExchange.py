@@ -1,7 +1,6 @@
-import chess
 import logging
-from globals import exchangeScoreBonusValue, exchangeScorePenaltyValue, strongCompensationThresholdValue, strongSacrificeBonusValue, mediumCompensationThresholdValue, mediumSacrificeBonusValue
-from src.factors.globals import centerSquares
+from src.params import exchangeScoreBonusValue, exchangeScorePenaltyValue, strongCompensationThresholdValue, strongSacrificeBonusValue, mediumCompensationThresholdValue, mediumSacrificeBonusValue
+from src.globals import CENTER_SQUARE
 from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)
@@ -40,7 +39,7 @@ def pieceExchange(board, side):
                 board.push(move)
 
                 centerControl = len(
-                    [square for square in centerSquares if board.is_attacked_by(side, square)]
+                    [square for square in CENTER_SQUARE if board.is_attacked_by(side, square)]
                 )
                 kingExposure = len(board.attackers(otherSide(side), board.king(otherSide(side))))
                 activityBonus = len(list(board.legal_moves))

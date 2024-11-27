@@ -1,16 +1,6 @@
-import chess
 
-centerSquares = {chess.E4, chess.D4, chess.E5, chess.D5}
-
-# util
+#util
 maxMaterialValueEndgame = 15
-pieceValues = {
-    chess.PAWN: 1,
-    chess.KNIGHT: 3,
-    chess.BISHOP: 3,
-    chess.ROOK: 5,
-    chess.QUEEN: 5,
-}
 
 # kingSafety
 pawnShieldBonusValue = 0.5
@@ -75,3 +65,5 @@ backRankBonusValue = 0
 backRankPenaltyValue = 0
 promotionScoreBonusValue = 0
 promotionPossibilityBonusValue = 0
+
+

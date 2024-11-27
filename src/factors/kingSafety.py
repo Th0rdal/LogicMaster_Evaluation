@@ -1,5 +1,5 @@
 import chess
-from globals import pawnShieldBonusValue, exposedKingPenaltyValue, castledBonusValue, notCastledPenaltyValue
+from src.params import pawnShieldBonusValue, exposedKingPenaltyValue, castledBonusValue, notCastledPenaltyValue
 from src.factors.util import getGamestatus, Gamestatus
 from util import otherSide
 import logging

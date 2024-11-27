@@ -1,6 +1,6 @@
 import chess
 import logging
-from globals import openFileBonusValue, semiOpenBonusValue, openDiagonalBonusValue, centralSquareAttackedBonusValue, centerSquares
+from src.params import openFileBonusValue, semiOpenBonusValue, openDiagonalBonusValue, centralSquareAttackedBonusValue, centerSquares
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,6 @@
 import chess
 import logging
-from globals import pawnBreakBonusValue, pawnBreakWithKingExposureBonusValue, structureBonusValue
-from src.factors.util import otherSide
+from src.params import pawnBreakBonusValue, pawnBreakWithKingExposureBonusValue
 
 logger = logging.getLogger(__name__)
 

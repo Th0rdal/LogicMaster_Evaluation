@@ -1,6 +1,6 @@
 import chess
 import logging
-from globals import isolatedPawnPenaltyValue, doublePawnPenaltyValue, backwardPawnPenaltyValue, passedPawnBonusValue, advancedPassedPawnBonusValue, chainLengthMultiplierBonusValue
+from src.params import isolatedPawnPenaltyValue, doublePawnPenaltyValue, backwardPawnPenaltyValue, passedPawnBonusValue, advancedPassedPawnBonusValue, chainLengthMultiplierBonusValue
 from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)

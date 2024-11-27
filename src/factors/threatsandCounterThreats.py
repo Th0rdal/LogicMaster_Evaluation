@@ -1,6 +1,6 @@
 import chess
 import logging
-from globals import strongThreatBonusValue, mediumThreatBonusValue, weakThreatBonusValue
+from src.params import strongThreatBonusValue, mediumThreatBonusValue, weakThreatBonusValue
 logger = logging.getLogger(__name__)
 
 def threats(board, side):

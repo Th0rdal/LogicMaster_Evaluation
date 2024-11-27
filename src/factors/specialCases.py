@@ -1,7 +1,4 @@
-import chess
 import logging
-from globals import backRankBonusValue, backRankPenaltyValue, promotionScoreBonusValue, promotionPossibilityBonusValue
-from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)
 

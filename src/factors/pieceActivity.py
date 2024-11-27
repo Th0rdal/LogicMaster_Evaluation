@@ -1,6 +1,7 @@
 import chess
 import logging
-from globals import centerSquares, mobilityWeightMultiplierBonusValue, pieceCoordinationBonusValue, centralizationBonusValue
+from src.params import mobilityWeightMultiplierBonusValue, pieceCoordinationBonusValue, centralizationBonusValue
+from src.globals import CENTER_SQUARE
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ def pieceActivity(board, side):
     logger.debug(f"The piece activity coordination score value is {coordinationScore}.")
 
     # centralization
-    for square in centerSquares:
+    for square in CENTER_SQUARE:
         piece = board.piece_at(square)
         if piece and piece.color == side:
             centralizationScore += centralizationBonusValue

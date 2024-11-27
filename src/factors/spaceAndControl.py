@@ -1,6 +1,6 @@
 import chess
 import logging
-from globals import spaceAdvantageMultiplierBonusValue, zugzwangBonusValue
+from src.params import spaceAdvantageMultiplierBonusValue, zugzwangBonusValue
 
 logger = logging.getLogger(__name__)
 
