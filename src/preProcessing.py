@@ -18,7 +18,7 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0
             if game is None:
                 break
         if game is None and count > 0:
-            return None #TODO make error. this meant that the start value is larger than the number of games
+            return ValueError("Start value is out of bounds.")
         count = 0
         if output is None:
             filesCreated += 1
