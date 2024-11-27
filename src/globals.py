@@ -14,3 +14,5 @@ PIECE_VALUE = {
 STOCKFISH_PATH = "stockfish17/stockfish/stockfish-windows-x86-64-avx2.exe"
 PGN_FILE = "../resources/lichess_db_standard_rated_2013-07.pgn"
 PGN_PATH = "../resources/"
+LOG_PATH = "../logs/"
+AI_LOGGING_PATH = "../logs/ai/"
