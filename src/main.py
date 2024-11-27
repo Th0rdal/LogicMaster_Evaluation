@@ -19,7 +19,7 @@ for ai in ["qlearning", "PPO", "DDGP"]:
 currentTime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')  # Format the timestamp
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',
-                    handlers=[logging.FileHandler(LOG_PATH+"logfile_"+str(currentTime)), logging.StreamHandler()])
+                    handlers=[logging.FileHandler(LOG_PATH+"logfile_"+str(currentTime)+".txt"), logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 def runContainer(imageName, container_name, loggingBase):
