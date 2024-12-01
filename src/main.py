@@ -1,7 +1,6 @@
 import os
 import logging
 import threading
-
 import docker
 from datetime import datetime
 
@@ -12,7 +11,7 @@ from src.globals import LOG_PATH, AI_LOGGING_PATH
 client = docker.from_env()
 if not os.path.exists(LOG_PATH):
     os.makedirs(os.path.dirname(LOG_PATH))
-for ai in ["qlearning", "PPO", "DDGP"]:
+for ai in ["qlearning/", "PPO/", "DDGP/"]:
     if not os.path.exists(AI_LOGGING_PATH+ai):
         os.makedirs(os.path.dirname(AI_LOGGING_PATH+ai))
 
@@ -25,7 +24,7 @@ logger = logging.getLogger(__name__)
 def runContainer(imageName, container_name, loggingBase):
     client = docker.from_env()
 
-    loggingPath = loggingBase + imageName + "/logs.txt"
+    loggingPath = loggingBase + imageName + "/" + imageName + "_logs_" + str(currentTime) + ".txt"
 
     # Run the container
     container = client.containers.run(
