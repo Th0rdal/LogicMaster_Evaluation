@@ -23,10 +23,12 @@ logger = logging.getLogger(__name__)
 
 class Qlearning(gym.Env):
 
-    metadata_threshold = 0.01
-    metadata_maxActionsPerBoard = 50
-    metadata_boardsPerEpoch = 1024
-    metadata_learning_rate = 0.001
+    metadata = {
+        "threshold": 0.01,
+        "maxActionsPerBoard" : 50,
+        "boardsPerEpoch" : 1024,
+        "learning_rate" : 0.001
+    }
     stateToBits = {-1: 1, 0: 0, 1: 2}
     bitsToState = {1: -1, 0: 0, 2: 1}
 
@@ -70,16 +72,15 @@ class Qlearning(gym.Env):
 
     def step(self, action):
 
-        self.stepChanges = {}
-        self.stepChanges["action"] = action
+        self.stepChanges = {"action": action}
 
         decodedAction = self.decodeAction(action)
         self.stepChanges["decodedAction"] = decodedAction
         delta = np.array(decodedAction) - 1
         self.stepChanges["paramChanges"] = []
         for element in Params.params:
-            element += delta * self.metadata_learning_rate
-            self.stepChanges["paramChanges"].append(delta * self.metadata_learning_rate)
+            element += delta * self.metadata["learning_rate"]
+            self.stepChanges["paramChanges"].append(delta * self.metadata["learning_rate"])
 
         # run function and return actual and expected output
         actualResult = self.target_function(self.input)
@@ -95,11 +96,11 @@ class Qlearning(gym.Env):
         observation = np.array(Params.params[:5] + [self.current_error])
         self.stepChanges["observation"] = observation
 
-        done = self.current_error < self.metadata_threshold
+        done = self.current_error < self.metadata["threshold"]
 
         self.stepChanges["currentActionCounter"] = self.currentActionCount
         self.currentActionCount += 1
-        if self.currentActionCount == self.metadata_maxActionsPerBoard:
+        if self.currentActionCount == self.metadata["maxActionsPerBoard"]:
             logger.info(f"Board {self.inputProcessor.boardCounter} ({self.inputProcessor.currentBoardType}) results: {self.inputChanges}")
             self.inputChanges = {}
             done = True
@@ -135,16 +136,32 @@ class Qlearning(gym.Env):
         self.inputProcessor.loadNextSet(boardType)
         self.inputGenerator = self.inputProcessor.getInputBoard()
 
+    def startTraining(self):
+        logger.info("Starting training!")
+        logger.info(f"Episode {self.inputProcessor.index}")
+
+        ai.getInput("training")
+        model.learn(total_timesteps=self.metadata["boardsPerEpoch"] * self.metadata["maxActionsPerBoard"])
+
+    def startTesting(self):
+        logger.info("Starting testing!")
+        logger.info(f"Episode {self.inputProcessor.index}")
+
+        ai.getInput("testing")
+        obs = ai.reset()
+        done = False
+        results = []
+        while not done:
+            #action, _states = model.predict(obs)
+            #obs, reward, done, info = ai.step(action)
+            #print(f"Observation: {obs}, Reward: {reward}, actual: {info["actual"]}, expected: {info["expected"]}")
+            result = self.target_function()
+            results.append(result)
+
 if __name__ == '__main__':
     ai = Qlearning(positionCalculator)
     model = DQN("MlpPolicy", ai, verbose=1)
 
-    ai.getInput("training")
-    model.learn(total_timesteps=ai.metadata_boardsPerEpoch * ai.metadata_maxActionsPerBoard)
+    ai.startTraining()
+    ai.startTesting()
 
-    obs = ai.reset()
-    done = False
-    while not done:
-        action, _states = model.predict(obs)
-        obs, reward, done, info = ai.step(action)
-        print(f"Observation: {obs}, Reward: {reward}, actual: {info["actual"]}, expected: {info["expected"]}")
