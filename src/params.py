@@ -1,69 +1,78 @@
 
-#util
-maxMaterialValueEndgame = 15
+class Params:
 
-# kingSafety
-pawnShieldBonusValue = 0.5
-exposedKingPenaltyValue = 0.5
-castledBonusValue = 1
-notCastledPenaltyValue = -1
+    # total of 43 parameter
+    totalParameter = 44
 
-# pawnStructure
-isolatedPawnPenaltyValue = -0.5
-doublePawnPenaltyValue = -0.5
-backwardPawnPenaltyValue = -0.5
-passedPawnBonusValue = 0.5
-advancedPassedPawnBonusValue = 0.5
-chainLengthMultiplierBonusValue = 0.25
+    # actual list of parameter
+    params = [0] * totalParameter
 
-# piece activity
-mobilityWeightMultiplierBonusValue = 0.1
-pieceCoordinationBonusValue = 0.5
-centralizationBonusValue = 1
+    #util
+    maxMaterialValueEndgame = params[0]
 
-# board control
-openFileBonusValue = 1
-semiOpenBonusValue = 0.5
-openDiagonalBonusValue = 1
-centralSquareAttackedBonusValue = 0.5
+    # material
+    materialImbalanceMultiplier = params[1]
 
-# tactical threats
-forkBonusValue = 1
-pinBonusValue = 1
-skewerBonusValue = 1
+    # kingSafety 1
+    pawnShieldBonusValue = params[2]
+    exposedKingPenaltyValue = params[3]
+    castledBonusValue = params[4]
+    notCastledPenaltyValue = params[5]
 
-# engame considerations
-kingCenterEndgameBonusValue = 0
-pawnKingproximityBonusValue = 0
-winningExchangeBonusValue = 0
-neutralExchangeBonusValue = 0
+    # pawnStructure 5
+    isolatedPawnPenaltyValue = params[6]
+    doublePawnPenaltyValue = params[7]
+    backwardPawnPenaltyValue = params[8]
+    passedPawnBonusValue = params[9]
+    advancedPassedPawnBonusValue = params[10]
+    chainLengthMultiplierBonusValue = params[11]
 
-# space and control
-spaceAdvantageMultiplierBonusValue = 0.2
-zugzwangBonusValue = 1
+    # piece activity 11
+    mobilityWeightMultiplierBonusValue = params[12]
+    pieceCoordinationBonusValue = params[13]
+    centralizationBonusValue = params[14]
 
-# pawn dynamics
-pawnBreakBonusValue = 1
-pawnBreakWithKingExposureBonusValue = 1
-structureBonusValue = 1
+    # board control 14
+    openFileBonusValue = params[15]
+    semiOpenBonusValue = params[16]
+    openDiagonalBonusValue = params[17]
+    centralSquareAttackedBonusValue = params[18]
 
-# piece exchange
-exchangeScoreBonusValue = 1
-exchangeScorePenaltyValue = 1
-strongCompensationThresholdValue = 1
-strongSacrificeBonusValue = 1
-mediumCompensationThresholdValue = 1
-mediumSacrificeBonusValue = 1
+    # tactical threats 18
+    forkBonusValue = params[19]
+    pinBonusValue = params[20]
+    skewerBonusValue = params[21]
 
-# threats
-strongThreatBonusValue = 0
-mediumThreatBonusValue = 0
-weakThreatBonusValue = 0
+    # engame considerations 21
+    kingCenterEndgameBonusValue = params[22]
+    pawnKingproximityBonusValue = params[23]
+    winningExchangeBonusValue = params[24]
+    neutralExchangeBonusValue = params[25]
 
-# special case
-backRankBonusValue = 0
-backRankPenaltyValue = 0
-promotionScoreBonusValue = 0
-promotionPossibilityBonusValue = 0
+    # space and control 25
+    spaceAdvantageMultiplierBonusValue = params[26]
+    zugzwangBonusValue = params[27]
 
+    # pawn dynamics 27
+    pawnBreakBonusValue = params[28]
+    pawnBreakWithKingExposureBonusValue = params[29]
+    structureBonusValue = params[30]
 
+    # piece exchange 30
+    exchangeScoreBonusValue = params[31]
+    exchangeScorePenaltyValue = params[32]
+    strongCompensationThresholdValue = params[33]
+    strongSacrificeBonusValue = params[34]
+    mediumCompensationThresholdValue = params[35]
+    mediumSacrificeBonusValue = params[36]
+
+    # threats 36
+    strongThreatBonusValue = params[37]
+    mediumThreatBonusValue = params[38]
+    weakThreatBonusValue = params[39]
+
+    # special case 39
+    backRankBonusValue = params[40]
+    backRankPenaltyValue = params[41]
+    promotionScoreBonusValue = params[42]
+    promotionPossibilityBonusValue = params[43]

@@ -1,7 +1,6 @@
 import chess
-from src.params import pawnShieldBonusValue, exposedKingPenaltyValue, castledBonusValue, notCastledPenaltyValue
-from src.factors.util import getGamestatus, Gamestatus
-from util import otherSide
+from src.params import Params
+from src.factors.util import getGamestatus, Gamestatus, otherSide
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,21 +30,23 @@ def kingSafety(board, side):
     for offset in [-1, 0, 1]:
         if 0 <= kingFile + offset <= 7:
             pawnSquare = chess.square(kingFile + offset, chess.square_rank(kingSquare) + (-1 if side == chess.WHITE else 1))
+            if 0 > pawnSquare or pawnSquare > 7:
+                continue
             if board.piece_at(pawnSquare) == chess.Piece(chess.PAWN, side):
-                pawnShield += pawnShieldBonusValue
+                pawnShield += Params.pawnShieldBonusValue
             for attackSquare in board.attacks(pawnSquare):
                 if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
-                    exposedPenaltyTotal += exposedKingPenaltyValue
+                    exposedPenaltyTotal += Params.exposedKingPenaltyValue
     pawnShield = pawnShield if getGamestatus(board) != Gamestatus.ENDGAME else 0
     logger.info(f"The king safety pawn shield value is {pawnShield}.")
 
     for attackSquare in board.attacks(kingSquare):
         if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
-            exposedPenaltyTotal += exposedKingPenaltyValue
+            exposedPenaltyTotal += Params.exposedKingPenaltyValue
 
     logger.info(f"The king safety exposed penalty total is {exposedPenaltyTotal}.")
 
-    castlingBonus = notCastledPenaltyValue if board.has_castling_rights(side) else castledBonusValue
+    castlingBonus = Params.notCastledPenaltyValue if board.has_castling_rights(side) else Params.castledBonusValue
     castlingBonus = castlingBonus if getGamestatus(board) != Gamestatus.ENDGAME else 0
     logger.info(f"The king safety castling bonus is {castlingBonus}.")
 

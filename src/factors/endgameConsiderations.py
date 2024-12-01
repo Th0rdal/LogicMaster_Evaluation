@@ -1,6 +1,6 @@
 import chess
 import logging
-from src.params import kingCenterEndgameBonusValue, pawnKingproximityBonusValue, winningExchangeBonusValue, neutralExchangeBonusValue
+from src.params import Params
 from src.globals import CENTER_SQUARE
 from src.factors.util import otherSide, getGamestatus, Gamestatus
 
@@ -27,11 +27,11 @@ def endgameConsiderations(board, side):
     if len(list(board.pieces(chess.QUEEN, otherSide(side)))) == 0:
         kingSquare = board.king(side)
         if kingSquare in CENTER_SQUARE:
-            activityScore += kingCenterEndgameBonusValue
+            activityScore += Params.kingCenterEndgameBonusValue
 
         for pawnSquare in board.pieces(chess.PAWN, side):
             if chess.square_distance(kingSquare, pawnSquare) <= 1:
-                activityScore += pawnKingproximityBonusValue
+                activityScore += Params.pawnKingproximityBonusValue
     logger.info(f"The endgame consideration activity score is {activityScore}.")
 
     # simplification
@@ -46,9 +46,9 @@ def endgameConsiderations(board, side):
                 defenderValue = defender.piece_type
 
                 if attackerValue < defenderValue:
-                    simplificationScore += winningExchangeBonusValue
+                    simplificationScore += Params.winningExchangeBonusValue
                 elif attackerValue == defenderValue:
-                    simplificationScore += neutralExchangeBonusValue
+                    simplificationScore += Params.neutralExchangeBonusValue
 
         board.pop()
     logger.info(f"The endgame consideration simplification score value is {activityScore}.")

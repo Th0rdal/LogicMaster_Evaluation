@@ -2,10 +2,11 @@ import chess
 import logging
 
 from src.factors.util import calculateMaterialTotal
+from src.params import Params
 
 logger = logging.getLogger(__name__)
 
-def calculatedMaterialImbalance(board):
+def calculatedMaterialImbalance(board, side):
     """
     @brief
     Calculates the material imbalance of the board that is given.
@@ -22,6 +23,6 @@ def calculatedMaterialImbalance(board):
 
     material = calculateMaterialTotal(board)
 
-    logger.info(f"The total material value of white is {material['WHITE']}")
-    logger.info(f"The total material value of black is {material['BLACK']}")
-    return material[chess.WHITE] - material[chess.BLACK]
+    logger.info(f"The total material value of white is {material[chess.WHITE]}")
+    logger.info(f"The total material value of black is {material[chess.BLACK]}")
+    return (material[chess.WHITE] - material[chess.BLACK]) * Params.materialImbalanceMultiplier

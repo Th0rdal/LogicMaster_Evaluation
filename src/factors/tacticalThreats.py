@@ -1,6 +1,6 @@
 import chess
 import logging
-from src.params import forkBonusValue, pinBonusValue, skewerBonusValue
+from src.params import Params
 from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def tacticalThreats(board, side):
 
         valuablePieces = [p for p in attackedPieces if p.piece_type in [chess.ROOK, chess.QUEEN, chess.KING]]
         if len(valuablePieces) > 1:
-            forkScore += forkBonusValue
+            forkScore += Params.forkBonusValue
     logger.info(f"The tactical threats fork score value is {forkScore}.")
 
     # pins
@@ -39,7 +39,7 @@ def tacticalThreats(board, side):
                 if pinnedPiece.piece_type != chess.KING:
                     for behindSquare in board.attacks(targetSquare):
                         if board.piece_at(behindSquare) and board.piece_at(behindSquare).color == otherSide(side):
-                            pinScore += pinBonusValue
+                            pinScore += Params.pinBonusValue
     logger.info(f"The tactical threats pin score value is {pinScore}.")
 
     # skewers
@@ -49,7 +49,7 @@ def tacticalThreats(board, side):
             if board.piece_at(targetSquare) and board.piece_at(targetSquare).piece_type == chess.KING:
                 for behindSquare in board.attacks(targetSquare):
                     if board.piece_at(behindSquare) and board.piece_at(behindSquare).color == otherSide(side):
-                        skewerScore += skewerBonusValue
+                        skewerScore += Params.skewerBonusValue
     logger.info(f"The tactical threats skewer score value is {skewerScore}.")
 
     totalValue = forkScore + pinScore + skewerScore

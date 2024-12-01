@@ -1,7 +1,7 @@
 import chess
 from enum import Enum
 
-from src.params import maxMaterialValueEndgame
+from src.params import Params
 from src.globals import PIECE_VALUE
 
 
@@ -27,7 +27,7 @@ def getGamestatus(board):
     """
 
     material = calculateMaterialTotal(board)
-    if material[chess.WHITE] > maxMaterialValueEndgame or material[chess.BLACK] > maxMaterialValueEndgame:
+    if material[chess.WHITE] > Params.maxMaterialValueEndgame or material[chess.BLACK] > Params.maxMaterialValueEndgame:
         return Gamestatus.ENDGAME
     return Gamestatus.OPENING
 

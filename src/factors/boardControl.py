@@ -1,6 +1,7 @@
 import chess
 import logging
-from src.params import openFileBonusValue, semiOpenBonusValue, openDiagonalBonusValue, centralSquareAttackedBonusValue, centerSquares
+from src.params import Params
+from src.globals import CENTER_SQUARE
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +30,9 @@ def boardControl(board, side):
         blackPawns = board.pieces(chess.PAWN, chess.BLACK) & chess.BB_FILES[file]
 
         if not whitePawns and not blackPawns:
-            fileScore += openFileBonusValue
+            fileScore += Params.openFileBonusValue
         elif not whitePawns:
-            fileScore += semiOpenBonusValue
+            fileScore += Params.semiOpenBonusValue
     logger.info(f"The board control file score value is {fileScore}.")
 
     for pieceSquares in board.pieces(chess.BISHOP, side) | board.pieces(chess.QUEEN, side):
@@ -41,12 +42,12 @@ def boardControl(board, side):
                 isOpen = False
                 break
         if isOpen:
-            diagonalScore += openDiagonalBonusValue
+            diagonalScore += Params.openDiagonalBonusValue
     logger.info(f"The board control diagonal score value is {diagonalScore}.")
 
-    for square in centerSquares:
+    for square in CENTER_SQUARE:
         if board.is_attacked_by(side, square):
-            centralSquaresAttackedScore += centralSquareAttackedBonusValue
+            centralSquaresAttackedScore += Params.centralSquareAttackedBonusValue
     logger.info(f"The board control central control score value is {centralSquaresAttackedScore}.")
 
     totalValue = fileScore + diagonalScore + centralSquaresAttackedScore

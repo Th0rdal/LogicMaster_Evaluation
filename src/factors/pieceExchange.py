@@ -1,5 +1,5 @@
 import logging
-from src.params import exchangeScoreBonusValue, exchangeScorePenaltyValue, strongCompensationThresholdValue, strongSacrificeBonusValue, mediumCompensationThresholdValue, mediumSacrificeBonusValue
+from src.params import Params
 from src.globals import CENTER_SQUARE
 from src.factors.util import otherSide
 
@@ -31,9 +31,9 @@ def pieceExchange(board, side):
                 defenderPiece = defender.piece_type
 
                 if attackerPiece < defenderPiece:
-                    exchangeScore += exchangeScoreBonusValue
+                    exchangeScore += Params.exchangeScoreBonusValue
                 elif attackerPiece > defenderPiece:
-                    exchangeScore += exchangeScorePenaltyValue
+                    exchangeScore += Params.exchangeScorePenaltyValue
 
                 # calculate sacrifice score
                 board.push(move)
@@ -45,10 +45,10 @@ def pieceExchange(board, side):
                 activityBonus = len(list(board.legal_moves))
 
                 compensation = centerControl + kingExposure + activityBonus
-                if compensation >= strongCompensationThresholdValue:
-                    sacrificeScore += strongSacrificeBonusValue
-                elif compensation >= mediumCompensationThresholdValue:
-                    sacrificeScore += mediumSacrificeBonusValue
+                if compensation >= Params.strongCompensationThresholdValue:
+                    sacrificeScore += Params.strongSacrificeBonusValue
+                elif compensation >= Params.mediumCompensationThresholdValue:
+                    sacrificeScore += Params.mediumSacrificeBonusValue
 
                 board.pop()
 

@@ -1,6 +1,6 @@
 import chess
 import logging
-from src.params import isolatedPawnPenaltyValue, doublePawnPenaltyValue, backwardPawnPenaltyValue, passedPawnBonusValue, advancedPassedPawnBonusValue, chainLengthMultiplierBonusValue
+from src.params import Params
 from src.factors.util import otherSide
 
 logger = logging.getLogger(__name__)
@@ -25,15 +25,15 @@ def pawnStructure(board, side):
         file = chess.square_file(pawnSquare)
         # Check if adjacent files are empty of friendly pawns
         if not any(board.pieces(chess.PAWN, side) & chess.BB_FILES[file + offset] for offset in [-1, 1] if 0 <= file + offset <= 7):
-            isolatedPenalty -= isolatedPawnPenaltyValue
+            isolatedPenalty -= Params.isolatedPawnPenaltyValue
     logger.info(f"The pawn structure isolated penalty is {isolatedPenalty}.")
 
     # double pawns
     doubledPawnPenalty = 0
     for file in range(8):
-        pawnsOnFile = sum(1 for square in chess.BB_FILES[file] if board.piece_at(square) == chess.Piece(chess.PAWN, side))
+        pawnsOnFile = sum(1 for square in chess.SquareSet(chess.BB_FILES[file]) if board.piece_at(square) == chess.Piece(chess.PAWN, side))
         if pawnsOnFile > 1:
-            doubledPawnPenalty += doublePawnPenaltyValue
+            doubledPawnPenalty += Params.doublePawnPenaltyValue
     logger.info(f"The pawn structure double pawn penalty is {doubledPawnPenalty}.")
 
     # backwards pawns
@@ -42,7 +42,7 @@ def pawnStructure(board, side):
         file = chess.square_file(pawnSquare)
         if not any (board.pieces(chess.PAWN, side) & chess.BB_FILES[file + offset] for offset in [-1, 1] if 0 <= file + offset <= 7):
             if board.piece_at(chess.square(file, chess.square_rank(pawnSquare) + 1)) is not None:
-                backwardPawnPenalty += backwardPawnPenaltyValue
+                backwardPawnPenalty += Params.backwardPawnPenaltyValue
     logger.info(f"The pawn structure backwards pawn penalty is {backwardPawnPenalty}.")
 
     # passed pawn
@@ -52,9 +52,9 @@ def pawnStructure(board, side):
         rank = chess.square_rank(pawnSquare)
         # Check no opposing pawns block on the file or adjacent files
         if not any(board.pieces(chess.PAWN, otherSide(side)) & chess.BB_FILES[file + offset] for offset in [-1, 0, 1] if 0 <= file + offset <= 7):
-            passedPawnBonus += passedPawnBonusValue
+            passedPawnBonus += Params.passedPawnBonusValue
             if rank >= 4:  # Advanced pawn
-                passedPawnBonus += advancedPassedPawnBonusValue
+                passedPawnBonus += Params.advancedPassedPawnBonusValue
     logger.info(f"The pawn structure passed pawn bonus is {passedPawnBonus}.")
 
     # pawn chains
@@ -74,7 +74,7 @@ def pawnStructure(board, side):
                 currentSquare = nextSquare
             else:
                 break
-        chainBonus += chainLength * chainLengthMultiplierBonusValue
+        chainBonus += chainLength * Params.chainLengthMultiplierBonusValue
     logger.info(f"The pawn structure chain bonus is {chainBonus}.")
 
     totalValue = (passedPawnBonus + chainBonus) - (isolatedPenalty + doubledPawnPenalty + backwardPawnPenalty)

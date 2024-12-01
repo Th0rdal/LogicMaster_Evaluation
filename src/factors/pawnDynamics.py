@@ -1,6 +1,6 @@
 import chess
 import logging
-from src.params import pawnBreakBonusValue, pawnBreakWithKingExposureBonusValue
+from src.params import Params
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +24,9 @@ def pawnDynamics(board, side):
         if board.piece_at(move.from_square) and board.piece_at(move.from_square).piece_type == chess.PAWN:
             board.push(move)
             if board.is_capture(move):
-                pawnBreakScore += pawnBreakBonusValue
+                pawnBreakScore += Params.pawnBreakBonusValue
             if board.is_check():
-                pawnBreakScore += pawnBreakWithKingExposureBonusValue
+                pawnBreakScore += Params.pawnBreakWithKingExposureBonusValue
             board.pop()
 
     logger.info(f"The pawn dynamics structure score value is {structureScore}.")

@@ -1,6 +1,6 @@
 import chess
 import logging
-from src.params import strongThreatBonusValue, mediumThreatBonusValue, weakThreatBonusValue
+from src.params import Params
 logger = logging.getLogger(__name__)
 
 def threats(board, side):
@@ -29,11 +29,11 @@ def threats(board, side):
             piece = board.piece_at(square)
             if piece and piece.color != side:
                 if piece.piece_type == chess.KING:
-                    threatScore += strongThreatBonusValue
+                    threatScore += Params.strongThreatBonusValue
                 elif piece.piece_type in [chess.QUEEN, chess.ROOK]:
-                    threatScore += mediumThreatBonusValue
+                    threatScore += Params.mediumThreatBonusValue
                 elif piece.piece_type in [chess.BISHOP, chess.KNIGHT]:
-                    threatScore += weakThreatBonusValue
+                    threatScore += Params.weakThreatBonusValue
         board.pop()
 
     logger.info(f"The threats threat score value is {threatScore}.")
