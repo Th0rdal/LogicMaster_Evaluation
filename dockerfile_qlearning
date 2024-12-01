@@ -1,22 +1,11 @@
-# Base Python image
-FROM python:3.9-slim
-
-# Set working directory inside the container
-WORKDIR /app
+FROM ai_base
 
 # Copy your source code into the container
 COPY src/qLearning ./src/qLearning
-COPY src/params.py ./src/params.py
-COPY src/globals.py ./src/globals.py
-COPY src/stockfish.py ./src/stockfish.py
-
-# Copy training and testing data into the container
-#COPY resources/training /app/resources/training
-#COPY resources/testing /app/resources/testing
 
 # Install Python dependencies if you have a requirements.txt
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY qlearning_requirements.txt .
+RUN pip install --no-cache-dir -r qlearning_requirements.txt
 
 # Command to run your Python AI program
 CMD ["python", "src/qLearning/qLearning.py"]

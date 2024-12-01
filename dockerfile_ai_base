@@ -1,0 +1,18 @@
+# Base Python image
+FROM python:3.9-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy your source code into the container
+COPY src/params.py ./src/params.py
+COPY src/globals.py ./src/globals.py
+COPY src/stockfish.py ./src/stockfish.py
+COPY src/inputProcessing.py ./src/inputProcessing.py
+
+# add stockfish for calculating expected result
+COPY src/stockfish17 ./src/stockfish17
+
+# Copy training and testing data into the container
+#COPY resources/training /app/resources/training
+#COPY resources/testing /app/resources/testing

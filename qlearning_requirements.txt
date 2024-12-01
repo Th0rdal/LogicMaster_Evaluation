@@ -1,7 +1,4 @@
 chess==1.0.0
-docker
-matplotlib
 stable-baselines3
 numpy
 gym
-shimmy
