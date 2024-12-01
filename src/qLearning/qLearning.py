@@ -1,20 +1,25 @@
+import sys
+
 import chess
 import gym
 import time
 from gym import spaces
 import numpy as np
 from stable_baselines3 import DQN
+import logging
 
 from src.factors.position_calculator import positionCalculator
+from src.globals import LOG_PATH
 from src.params import Params
 from src.stockfish import getExpectedResult
 from src.inputProcessing import InputProcessor
 
-"""
-for x in range(10):
-    print(x, flush=True)
-    time.sleep(1)
-"""
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',
+                    handlers=[logging.StreamHandler(sys.stdout)])
+
+logger = logging.getLogger(__name__)
+
 
 class Qlearning(gym.Env):
 
@@ -46,6 +51,9 @@ class Qlearning(gym.Env):
         self.target_function = targetFunction
         self.expected_output = 0
         self.current_error = float('inf')
+        self.episodeChangesDone = []
+        self.stepChanges = {}
+        self.inputChanges = {}
 
     def encodeAction(self):
         actionIndex = 0
@@ -62,37 +70,62 @@ class Qlearning(gym.Env):
 
     def step(self, action):
 
+        self.stepChanges = {}
+        self.stepChanges["action"] = action
+
         decodedAction = self.decodeAction(action)
+        self.stepChanges["decodedAction"] = decodedAction
         delta = np.array(decodedAction) - 1
+        self.stepChanges["paramChanges"] = []
         for element in Params.params:
             element += delta * self.metadata_learning_rate
+            self.stepChanges["paramChanges"].append(delta * self.metadata_learning_rate)
 
         # run function and return actual and expected output
         actualResult = self.target_function(self.input)
-        self.current_error = getExpectedResult(self.input)
+        self.stepChanges["actualResult"] = actualResult
 
         #calculate error and reward
         self.current_error = abs(self.expected_output - actualResult)
         reward = -self.current_error
 
+        self.stepChanges["error"] = self.current_error
+        self.stepChanges["reward"] = reward
+
         observation = np.array(Params.params[:5] + [self.current_error])
+        self.stepChanges["observation"] = observation
 
         done = self.current_error < self.metadata_threshold
 
+        self.stepChanges["currentActionCounter"] = self.currentActionCount
         self.currentActionCount += 1
         if self.currentActionCount == self.metadata_maxActionsPerBoard:
+            logger.info(f"Board {self.inputProcessor.boardCounter} ({self.inputProcessor.currentBoardType}) results: {self.inputChanges}")
+            self.inputChanges = {}
             done = True
-        return observation, reward, done, {}
+        self.inputChanges["steps"].append(self.stepChanges)
+        return observation, reward, done, self.stepChanges
 
     def reset(self, **kwargs):
         for element in Params.params:
             element += np.random.uniform(-5, 5)
         self.input = chess.Board(next(self.inputGenerator))
         if self.input is None:
+            self.episodeChangesDone.append(self.inputChanges)
+            logger.info(f"Episode {self.inputProcessor.index} ({self.inputProcessor.currentBoardType}) results: {self.episodeChangesDone}")
+            self.episodeChangesDone = []
             raise StopIteration("Episode completed. Input is None!")
+
+        self.inputChanges["input"] = self.input
+
         self.expected_output = getExpectedResult(self.input)
+        self.inputChanges["expectedResult"] = self.expected_output
+
         computed_value = self.target_function(self.input)
         self.current_error = abs(self.expected_output - computed_value)
+        self.inputChanges["initialResult"] = computed_value
+        self.inputChanges["initialError"] = self.current_error
+        self.inputChanges["steps"] = []
 
         self.currentActionCount = 0
 
@@ -114,4 +147,4 @@ if __name__ == '__main__':
     while not done:
         action, _states = model.predict(obs)
         obs, reward, done, info = ai.step(action)
-        print(f"Observation: {obs}, Reward: {reward}")
+        print(f"Observation: {obs}, Reward: {reward}, actual: {info["actual"]}, expected: {info["expected"]}")

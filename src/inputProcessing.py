@@ -6,7 +6,9 @@ class InputProcessor:
     basePath = "../../resources/" #"/app/resources/"
     currentFile = ""
     index = 1
+    boardCounter = 0 # counts how many boards of the current set have been "given out" already
     currentPath = ""
+    currentBoardType = None
 
     def getInputBoard(self):
         """
@@ -19,6 +21,7 @@ class InputProcessor:
         with open(self.currentPath) as file:
             for line in file:
                 yield line.strip()
+                self.boardCounter += 1
         return None
 
     def loadNextSet(self, boardType):
@@ -29,5 +32,6 @@ class InputProcessor:
         :return: None
         """
         self.currentPath = self.basePath + boardType + "/" + str(self.index)
+        self.currentBoardType = boardType
         if boardType == "testing":
             self.index += 1
