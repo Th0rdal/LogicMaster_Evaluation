@@ -33,20 +33,20 @@ def kingSafety(board, side):
             if 0 > pawnSquare or pawnSquare > 7:
                 continue
             if board.piece_at(pawnSquare) == chess.Piece(chess.PAWN, side):
-                pawnShield += Params.pawnShieldBonusValue
+                pawnShield += Params.pawnShieldBonusValue()
             for attackSquare in board.attacks(pawnSquare):
                 if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
-                    exposedPenaltyTotal += Params.exposedKingPenaltyValue
+                    exposedPenaltyTotal += Params.exposedKingPenaltyValue()
     pawnShield = pawnShield if getGamestatus(board) != Gamestatus.ENDGAME else 0
     logger.info(f"The king safety pawn shield value is {pawnShield}.")
 
     for attackSquare in board.attacks(kingSquare):
         if board.piece_at(attackSquare) == chess.Piece(chess.PAWN, otherSide(side)):
-            exposedPenaltyTotal += Params.exposedKingPenaltyValue
+            exposedPenaltyTotal += Params.exposedKingPenaltyValue()
 
     logger.info(f"The king safety exposed penalty total is {exposedPenaltyTotal}.")
 
-    castlingBonus = Params.notCastledPenaltyValue if board.has_castling_rights(side) else Params.castledBonusValue
+    castlingBonus = Params.notCastledPenaltyValue() if board.has_castling_rights(side) else Params.castledBonusValue()
     castlingBonus = castlingBonus if getGamestatus(board) != Gamestatus.ENDGAME else 0
     logger.info(f"The king safety castling bonus is {castlingBonus}.")
 

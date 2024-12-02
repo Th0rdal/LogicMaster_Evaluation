@@ -1,18 +1,47 @@
+import copy
 import sys
-
 import chess
 import gym
-import time
 from gym import spaces
 import numpy as np
 from stable_baselines3 import DQN
 import logging
 
 from src.factors.position_calculator import positionCalculator
-from src.globals import LOG_PATH
 from src.params import Params
 from src.stockfish import getExpectedResult
 from src.inputProcessing import InputProcessor
+"""
+import os
+
+
+def print_directory_tree(start_path, level=0):
+    try:
+        # Print the current directory
+        indent = " " * (level * 4)  # Indentation for subdirectories
+        print(f"{indent}{os.path.basename(start_path)}/")
+
+        # List all items in the current directory
+        for entry in os.listdir(start_path):
+            entry_path = os.path.join(start_path, entry)
+            if os.path.isdir(entry_path):
+                # Recurse into subdirectory
+                print_directory_tree(entry_path, level + 1)
+            else:
+                # Print file with appropriate indentation
+                print(f"{indent}    {entry}")
+    except PermissionError:
+        # Skip directories/files you don't have permissions for
+        print(f"{indent}    [Permission Denied]")
+    except FileNotFoundError:
+        # Skip directories that might disappear during traversal
+        print(f"{indent}    [File Not Found]")
+    except Exception as e:
+        # Catch all other errors
+        print(f"{indent}    [Error: {e}]")
+
+
+print_directory_tree("/app")"""
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',
@@ -37,7 +66,7 @@ class Qlearning(gym.Env):
 
         # create actions space. Each variable can be slightly increased, stay the same or be slightly decreased. Each parameter can be changed in any of these 3 ways
         self.input = None
-        self.currentActionCount = None
+        self.currentActionCount = 0
         self.inputGenerator = None
         self.inputProcessor = InputProcessor()
         self.action_space = spaces.Discrete(3 ** 5)
@@ -71,19 +100,19 @@ class Qlearning(gym.Env):
         return params
 
     def step(self, action):
-
+        self.stepChanges = {}
         self.stepChanges = {"action": action}
 
         decodedAction = self.decodeAction(action)
         self.stepChanges["decodedAction"] = decodedAction
         delta = np.array(decodedAction) - 1
         self.stepChanges["paramChanges"] = []
-        for element in Params.params:
-            element += delta * self.metadata["learning_rate"]
-            self.stepChanges["paramChanges"].append(delta * self.metadata["learning_rate"])
+        Params.params += (delta * self.metadata["learning_rate"])
+        self.stepChanges["paramChanges"].append(delta * self.metadata["learning_rate"])
 
         # run function and return actual and expected output
         actualResult = self.target_function(self.input)
+        logging.info(f"actual: {actualResult}")
         self.stepChanges["actualResult"] = actualResult
 
         #calculate error and reward
@@ -93,44 +122,54 @@ class Qlearning(gym.Env):
         self.stepChanges["error"] = self.current_error
         self.stepChanges["reward"] = reward
 
-        observation = np.array(Params.params[:5] + [self.current_error])
+        observation = np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
         self.stepChanges["observation"] = observation
 
         done = self.current_error < self.metadata["threshold"]
 
         self.stepChanges["currentActionCounter"] = self.currentActionCount
         self.currentActionCount += 1
+        self.inputChanges["steps"].append(copy.deepcopy(self.stepChanges))
         if self.currentActionCount == self.metadata["maxActionsPerBoard"]:
             logger.info(f"Board {self.inputProcessor.boardCounter} ({self.inputProcessor.currentBoardType}) results: {self.inputChanges}")
-            self.inputChanges = {}
-            done = True
-        self.inputChanges["steps"].append(self.stepChanges)
+            self.episodeChangesDone.append(copy.deepcopy(self.inputProcessor.boardCounter))
+            done = self.loadNewInput()
+            if done:
+                self.episodeChangesDone.append(self.inputChanges)
+                logger.info(f"Episode {self.inputProcessor.index} ({self.inputProcessor.currentBoardType}) results: {self.episodeChangesDone}")
+
+            self.currentActionCount = 0
+
         return observation, reward, done, self.stepChanges
 
     def reset(self, **kwargs):
         for element in Params.params:
             element += np.random.uniform(-5, 5)
+
+        self.episodeChangesDone = []
+        self.inputChanges = {}
+        self.stepChanges = {}
+
+        self.loadNewInput()
+
+        return np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
+
+    def loadNewInput(self):
+        self.inputChanges = {}
+
         self.input = chess.Board(next(self.inputGenerator))
         if self.input is None:
-            self.episodeChangesDone.append(self.inputChanges)
-            logger.info(f"Episode {self.inputProcessor.index} ({self.inputProcessor.currentBoardType}) results: {self.episodeChangesDone}")
-            self.episodeChangesDone = []
-            raise StopIteration("Episode completed. Input is None!")
-
-        self.inputChanges["input"] = self.input
-
-        self.expected_output = getExpectedResult(self.input)
-        self.inputChanges["expectedResult"] = self.expected_output
-
-        computed_value = self.target_function(self.input)
-        self.current_error = abs(self.expected_output - computed_value)
-        self.inputChanges["initialResult"] = computed_value
-        self.inputChanges["initialError"] = self.current_error
-        self.inputChanges["steps"] = []
-
-        self.currentActionCount = 0
-
-        return Params.params[:5] + [self.current_error]
+            return True
+        else:
+            self.inputChanges["input"] = self.input
+            self.expected_output = getExpectedResult(self.input)
+            self.inputChanges["expectedResult"] = self.expected_output
+            computed_value = self.target_function(self.input)
+            self.current_error = abs(self.expected_output - computed_value)
+            self.inputChanges["initialResult"] = computed_value
+            self.inputChanges["initialError"] = self.current_error
+            self.inputChanges["steps"] = []
+        return False
 
     def getInput(self, boardType):
         self.inputProcessor.loadNextSet(boardType)
@@ -161,6 +200,7 @@ class Qlearning(gym.Env):
 if __name__ == '__main__':
     ai = Qlearning(positionCalculator)
     model = DQN("MlpPolicy", ai, verbose=1)
+    print("WORKING")
 
     ai.startTraining()
     ai.startTesting()

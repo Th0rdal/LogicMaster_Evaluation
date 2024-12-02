@@ -30,7 +30,7 @@ def spaceAndControl(board, side):
             blackControl.add(square)
 
     spaceAdvantage = len(whiteControl) - len(blackControl) if side == chess.WHITE else len(blackControl) - len(whiteControl)
-    spaceScore = spaceAdvantage * Params.spaceAdvantageMultiplierBonusValue
+    spaceScore = spaceAdvantage * Params.spaceAdvantageMultiplierBonusValue()
     logger.info(f"The space and control space score value is {spaceScore}.")
 
     opponentMoves = list(board.legal_moves)
@@ -42,7 +42,7 @@ def spaceAndControl(board, side):
             worstOutcomes += 1
         board.pop()
     if worstOutcomes == len(opponentMoves):
-        zugzwang += Params.zugzwangBonusValue
+        zugzwang += Params.zugzwangBonusValue()
     logger.info(f"The space and control zugzwang value is {zugzwang}.")
 
     totalValue = spaceScore + zugzwang

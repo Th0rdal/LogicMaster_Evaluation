@@ -30,9 +30,9 @@ def boardControl(board, side):
         blackPawns = board.pieces(chess.PAWN, chess.BLACK) & chess.BB_FILES[file]
 
         if not whitePawns and not blackPawns:
-            fileScore += Params.openFileBonusValue
+            fileScore += Params.openFileBonusValue()
         elif not whitePawns:
-            fileScore += Params.semiOpenBonusValue
+            fileScore += Params.semiOpenBonusValue()
     logger.info(f"The board control file score value is {fileScore}.")
 
     for pieceSquares in board.pieces(chess.BISHOP, side) | board.pieces(chess.QUEEN, side):
@@ -42,12 +42,12 @@ def boardControl(board, side):
                 isOpen = False
                 break
         if isOpen:
-            diagonalScore += Params.openDiagonalBonusValue
+            diagonalScore += Params.openDiagonalBonusValue()
     logger.info(f"The board control diagonal score value is {diagonalScore}.")
 
     for square in CENTER_SQUARE:
         if board.is_attacked_by(side, square):
-            centralSquaresAttackedScore += Params.centralSquareAttackedBonusValue
+            centralSquaresAttackedScore += Params.centralSquareAttackedBonusValue()
     logger.info(f"The board control central control score value is {centralSquaresAttackedScore}.")
 
     totalValue = fileScore + diagonalScore + centralSquaresAttackedScore

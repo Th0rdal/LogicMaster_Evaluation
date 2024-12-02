@@ -1,3 +1,6 @@
+import logging
+import chess
+
 from src.factors.boardControl import boardControl
 from src.factors.endgameConsiderations import endgameConsiderations
 from src.factors.kingSafety import kingSafety
@@ -11,9 +14,12 @@ from src.factors.specialCases import specialCases
 from src.factors.tacticalThreats import tacticalThreats
 from src.factors.threatsandCounterThreats import threats
 
+logger = logging.getLogger(__name__)
+
 def positionCalculator(board):
+    logger.info("Calculating actual position!")
     total = [0, 0]  #white is index 0, black is index 1
-    import chess
+
     for index, side in enumerate([chess.WHITE, chess.BLACK]):
         total[index] = (boardControl(board, side) +
                  endgameConsiderations(board, side) +

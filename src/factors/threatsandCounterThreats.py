@@ -29,11 +29,11 @@ def threats(board, side):
             piece = board.piece_at(square)
             if piece and piece.color != side:
                 if piece.piece_type == chess.KING:
-                    threatScore += Params.strongThreatBonusValue
+                    threatScore += Params.strongThreatBonusValue()
                 elif piece.piece_type in [chess.QUEEN, chess.ROOK]:
-                    threatScore += Params.mediumThreatBonusValue
+                    threatScore += Params.mediumThreatBonusValue()
                 elif piece.piece_type in [chess.BISHOP, chess.KNIGHT]:
-                    threatScore += Params.weakThreatBonusValue
+                    threatScore += Params.weakThreatBonusValue()
         board.pop()
 
     logger.info(f"The threats threat score value is {threatScore}.")

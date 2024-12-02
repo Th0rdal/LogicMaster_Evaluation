@@ -25,4 +25,4 @@ def calculatedMaterialImbalance(board, side):
 
     logger.info(f"The total material value of white is {material[chess.WHITE]}")
     logger.info(f"The total material value of black is {material[chess.BLACK]}")
-    return (material[chess.WHITE] - material[chess.BLACK]) * Params.materialImbalanceMultiplier
+    return (material[chess.WHITE] - material[chess.BLACK]) * Params.materialImbalanceMultiplier()

@@ -27,7 +27,7 @@ def getGamestatus(board):
     """
 
     material = calculateMaterialTotal(board)
-    if material[chess.WHITE] > Params.maxMaterialValueEndgame or material[chess.BLACK] > Params.maxMaterialValueEndgame:
+    if material[chess.WHITE] > Params.maxMaterialValueEndgame() or material[chess.BLACK] > Params.maxMaterialValueEndgame():
         return Gamestatus.ENDGAME
     return Gamestatus.OPENING
 

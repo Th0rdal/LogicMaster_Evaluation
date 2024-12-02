@@ -26,7 +26,7 @@ def pieceActivity(board, side):
 
     # mobility score
     legalMoves = len(list(board.legal_moves))
-    mobilityScore += legalMoves * Params.mobilityWeightMultiplierBonusValue
+    mobilityScore += legalMoves * Params.mobilityWeightMultiplierBonusValue()
 
     for pieceType in chess.PIECE_TYPES:
         for square in board.pieces(pieceType, side):
@@ -34,7 +34,7 @@ def pieceActivity(board, side):
             # piece coordination
             for attackSquare in board.attacks(square):
                 if board.piece_at(attackSquare) and board.piece_at(attackSquare).color == side:
-                    coordinationScore += Params.pieceCoordinationBonusValue
+                    coordinationScore += Params.pieceCoordinationBonusValue()
     logger.info(f"The piece activity mobility score value is {mobilityScore}.")
     logger.info(f"The piece activity coordination score value is {coordinationScore}.")
 
@@ -42,7 +42,7 @@ def pieceActivity(board, side):
     for square in CENTER_SQUARE:
         piece = board.piece_at(square)
         if piece and piece.color == side:
-            centralizationScore += Params.centralizationBonusValue
+            centralizationScore += Params.centralizationBonusValue()
     logger.info(f"The piece activity centralization score value is {centralizationScore}.")
 
     totalValue = mobilityScore + coordinationScore + centralizationScore
