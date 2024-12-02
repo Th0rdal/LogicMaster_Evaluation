@@ -11,7 +11,7 @@ PIECE_VALUE = {
     chess.QUEEN: 5,
 }
 
-STOCKFISH_PATH = "../stockfish17/stockfish/stockfish-windows-x86-64-avx2.exe"
+STOCKFISH_PATH = "src/stockfish/stockfish-windows-x86-64-avx2"
 PGN_FILE = "../resources/lichess_db_standard_rated_2013-07.pgn"
 PGN_PATH = "../resources/"
 LOG_PATH = "../logs/"

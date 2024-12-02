@@ -33,7 +33,7 @@ def runContainer(imageName, container_name, loggingBase):
         detach=True,
     )
 
-    with open(loggingPath, "w") as file:
+    with open(loggingPath, "w", encoding="utf-8") as file:
         file.write(f"Container {container_name} started with ID {container.id}")
 
         # Stream logs
@@ -59,4 +59,6 @@ if __name__ == "__main__":
     # Start the threads
     thread1.start()
     #thread2.start()
-    #docker build -t testimage -f dockerfile_qlearning .
+
+    # docker build -t ai_base -f .\dockerfile_ai_base .
+    # docker build -t qlearning -f dockerfile_qlearning .

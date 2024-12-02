@@ -1,11 +1,23 @@
 FROM ai_base
 
-# Copy your source code into the container
-COPY src/qLearning ./src/qLearning
 
 # Install Python dependencies if you have a requirements.txt
 COPY qlearning_requirements.txt .
-RUN pip install --no-cache-dir -r qlearning_requirements.txt
+RUN pip install -r qlearning_requirements.txt
+
+# Copy your source code into the container
+COPY src/qLearning/qLearning.py ./qLearning.py
+
+RUN apt-get update && apt-get install -y tar
+
+# add stockfish for calculating expected result
+COPY src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar
+
+RUN tar -xvf ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar \
+    && chmod +x ./stockfish/stockfish-ubuntu-x86-64-avx2 \
+    && rm ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar
+
+ENV STOCKFISH_PATH=/app/stockfish/stockfish-ubuntu-x86-64-avx2
 
 # Command to run your Python AI program
-CMD ["python", "src/qLearning/qLearning.py"]
+CMD ["python", "-m", "qLearning"]

@@ -1,13 +1,14 @@
 import logging
+import os
+
 import chess
 import chess.engine
-from src.globals import STOCKFISH_PATH
 
 logger = logging.getLogger(__name__)
 
 def getExpectedResult(board):
     logger.info("Calculating expected result")
-    with chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH) as engine:
+    with chess.engine.SimpleEngine.popen_uci(os.environ.get("STOCKFISH_PATH")) as engine:
         info = engine.analyse(board, chess.engine.Limit(time=10.0))
         score = info["score"].relative
 

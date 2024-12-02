@@ -1,9 +1,9 @@
-from src.main import currentTime
+import os
 
 
 class InputProcessor:
 
-    basePath = "../../resources/" #"/app/resources/"
+    basePath = "/app/resources/" if not os.environ.get("debug") else "../../resources/"
     currentFile = ""
     index = 1
     boardCounter = 0 # counts how many boards of the current set have been "given out" already
