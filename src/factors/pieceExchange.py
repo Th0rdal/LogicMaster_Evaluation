@@ -16,7 +16,7 @@ def pieceExchange(board, side):
     @param side: The side with the king to calculate the safety of (chess.WHITE or chess.BLACK)
     @return: Total value of piece exchange
     """
-    logger.info("Calculating piece exchanges")
+    logger.debug("Calculating piece exchanges")
 
     exchangeScore = 0
     sacrificeScore = 0
@@ -52,9 +52,9 @@ def pieceExchange(board, side):
 
                 board.pop()
 
-    logger.info(f"The piece exchange score value is {exchangeScore}.")
-    logger.info(f"The sacrifice score value is {sacrificeScore}.")
+    logger.debug(f"The piece exchange score value is {exchangeScore}.")
+    logger.debug(f"The sacrifice score value is {sacrificeScore}.")
 
     totalValue = exchangeScore + sacrificeScore
-    logger.info(f"The total piece exchange value is {totalValue}.")
+    logger.debug(f"The total piece exchange value is {totalValue}.")
     return totalValue

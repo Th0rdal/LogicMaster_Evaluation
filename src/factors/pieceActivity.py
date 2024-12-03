@@ -18,7 +18,7 @@ def pieceActivity(board, side):
     @return: Total value of piece activity
     """
 
-    logger.info("Calculating piece activity")
+    logger.debug("Calculating piece activity")
 
     mobilityScore = 0
     coordinationScore = 0
@@ -35,16 +35,16 @@ def pieceActivity(board, side):
             for attackSquare in board.attacks(square):
                 if board.piece_at(attackSquare) and board.piece_at(attackSquare).color == side:
                     coordinationScore += Params.pieceCoordinationBonusValue()
-    logger.info(f"The piece activity mobility score value is {mobilityScore}.")
-    logger.info(f"The piece activity coordination score value is {coordinationScore}.")
+    logger.debug(f"The piece activity mobility score value is {mobilityScore}.")
+    logger.debug(f"The piece activity coordination score value is {coordinationScore}.")
 
     # centralization
     for square in CENTER_SQUARE:
         piece = board.piece_at(square)
         if piece and piece.color == side:
             centralizationScore += Params.centralizationBonusValue()
-    logger.info(f"The piece activity centralization score value is {centralizationScore}.")
+    logger.debug(f"The piece activity centralization score value is {centralizationScore}.")
 
     totalValue = mobilityScore + coordinationScore + centralizationScore
-    logger.info(f"The total piece activity value is {totalValue}.")
+    logger.debug(f"The total piece activity value is {totalValue}.")
     return totalValue

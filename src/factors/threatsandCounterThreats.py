@@ -16,7 +16,7 @@ def threats(board, side):
     @return: Total value of threats
     """
 
-    logger.info("Calculating threats and counter threats")
+    logger.debug("Calculating threats and counter threats")
 
     threatScore = 0
 
@@ -36,8 +36,8 @@ def threats(board, side):
                     threatScore += Params.weakThreatBonusValue()
         board.pop()
 
-    logger.info(f"The threats threat score value is {threatScore}.")
+    logger.debug(f"The threats threat score value is {threatScore}.")
 
     totalValue = threatScore
-    logger.info(f"The total threat score value is {totalValue}.")
+    logger.debug(f"The total threat score value is {totalValue}.")
     return totalValue

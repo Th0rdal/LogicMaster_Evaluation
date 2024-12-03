@@ -17,7 +17,7 @@ from src.factors.threatsandCounterThreats import threats
 logger = logging.getLogger(__name__)
 
 def positionCalculator(board):
-    logger.info("Calculating actual position!")
+    logger.debug("Calculating actual position!")
     total = [0, 0]  #white is index 0, black is index 1
 
     for index, side in enumerate([chess.WHITE, chess.BLACK]):
