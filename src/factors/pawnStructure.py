@@ -68,7 +68,9 @@ def pawnStructure(board, side):
         # Trace the chain
         while True:
             nextSquare = chess.square(chess.square_file(currentSquare) + (1 if side == chess.WHITE else -1), chess.square_rank(currentSquare) + (1 if side == chess.WHITE else -1))
-            if board.piece_at(nextSquare) == chess.Piece(chess.PAWN, side):
+            if nextSquare >= 64 or nextSquare < 0:
+                break
+            elif board.piece_at(nextSquare) == chess.Piece(chess.PAWN, side):
                 chainLength += 1
                 visited.add(nextSquare)
                 currentSquare = nextSquare

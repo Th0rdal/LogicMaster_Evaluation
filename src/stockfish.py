@@ -12,8 +12,14 @@ def getExpectedResult(board):
         info = engine.analyse(board, chess.engine.Limit(time=10.0))
         score = info["score"].relative
 
-    logger.info(f"The expected result is {score.score() / 100:.2f}")
-    return score.score() / 100
+    if isinstance(score, chess.engine.Mate):
+        sign = 1 if score.mate() > 0 else -1
+        scoreValue = 10 * sign
+    else:
+        scoreValue = score.score()
+
+    logger.info(f"The expected result is {scoreValue / 100:.2f}")
+    return scoreValue / 100
 
 
 if __name__ == "__main__":

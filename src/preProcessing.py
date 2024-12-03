@@ -1,13 +1,13 @@
+import os
 import random
 
 import chess
 import chess.pgn
-from globals import PGN_FILE
-from src.globals import PGN_PATH
+from globals import PGN_FILE, PGN_PATH
 
 
 def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0):
-    with open(file, "r") as f:
+    with open(os.path.abspath(os.path.join(os.getcwd(), file)), "r") as f:
         filesCreated = 0
         count = 0
         output = None
@@ -38,7 +38,9 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0
             positions = []
             while not node.is_end():
                 node = node.variation(0)
-                positions.append(node.board().fen())
+                board = node.board()
+                if not board.is_game_over():
+                    positions.append(board.fen())
             if positions:
                 randomFen = random.choice(positions)
                 output.write(str(randomFen)+"\n")
