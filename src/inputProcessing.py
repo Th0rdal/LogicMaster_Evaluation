@@ -30,7 +30,7 @@ class InputProcessor:
             for line in file:
                 l = line.strip()
                 if l == "!STOP!":
-                    raise StopSignalSentException("Stop signal sent!") #TODO make custom
+                    raise StopSignalSentException("Stop signal sent!")
                 else:
                     yield l
                 self.boardCounter += 1
