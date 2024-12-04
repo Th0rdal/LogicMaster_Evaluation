@@ -1,4 +1,6 @@
 import copy
+import os.path
+import pickle
 import sys
 import chess
 import gym
@@ -6,6 +8,8 @@ from gym import spaces
 import numpy as np
 from stable_baselines3 import DQN
 import logging
+
+from stable_baselines3.common.callbacks import BaseCallback
 
 from src.factors.position_calculator import positionCalculator
 from src.params import Params
@@ -49,13 +53,25 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
+class StopTrainingCallback(BaseCallback):
+    def _on_step(self) -> bool:
+        # Check if a new episode has started
+        if self.locals.get("dones") is not None and any(self.locals["dones"]):
+            print(f"Episode done!")
+            return False  # Returning False stops training
+        return True
+
+    def __init__(self, verbose=0):
+        super(StopTrainingCallback, self).__init__(verbose)
+        self.episodeCount = 0
+
 
 class Qlearning(gym.Env):
 
     metadata = {
         "threshold": 0.01,
         "maxActionsPerBoard" : 50,
-        "boardsPerEpoch" : 1024,
+        "boardsPerEpoch" : 10,
         "learning_rate" : 0.001
     }
     stateToBits = {-1: 1, 0: 0, 1: 2}
@@ -157,51 +173,88 @@ class Qlearning(gym.Env):
     def loadNewInput(self):
         self.inputChanges = {}
 
-        self.input = chess.Board(next(self.inputGenerator))
-        if self.input is None:
+        try:
+            line = next(self.inputGenerator).split(":")
+        except StopIteration:
             return True
-        else:
-            self.inputChanges["input"] = self.input
-            self.expected_output = getExpectedResult(self.input)
-            self.inputChanges["expectedResult"] = self.expected_output
-            computed_value = self.target_function(self.input)
-            self.current_error = abs(self.expected_output - computed_value)
-            self.inputChanges["initialResult"] = computed_value
-            self.inputChanges["initialError"] = self.current_error
-            self.inputChanges["steps"] = []
+
+        self.input = chess.Board(line[0])
+        self.expected_output = float(line[1])
+        self.inputChanges["input"] = self.input
+        self.inputChanges["expectedResult"] = self.expected_output
+        computed_value = self.target_function(self.input)
+        self.current_error = abs(self.expected_output - computed_value)
+        self.inputChanges["initialResult"] = computed_value
+        self.inputChanges["initialError"] = self.current_error
+        self.inputChanges["steps"] = []
         return False
 
     def getInput(self, boardType):
         self.inputProcessor.loadNextSet(boardType)
         self.inputGenerator = self.inputProcessor.getInputBoard()
 
-    def startTraining(self):
+    def startTraining(self, skipIndex=0):
         logger.info("Starting training!")
         logger.info(f"Episode {self.inputProcessor.index}")
 
+
         ai.getInput("training")
-        model.learn(total_timesteps=self.metadata["boardsPerEpoch"] * self.metadata["maxActionsPerBoard"])
+        for _ in range(skipIndex):
+            next(self.inputGenerator)
+        model.learn(total_timesteps=self.metadata["boardsPerEpoch"] * self.metadata["maxActionsPerBoard"],
+                    callback = StopTrainingCallback(verbose=1))
 
     def startTesting(self):
         logger.info("Starting testing!")
         logger.info(f"Episode {self.inputProcessor.index}")
 
         ai.getInput("testing")
-        obs = ai.reset()
-        done = False
         results = []
-        while not done:
-            #action, _states = model.predict(obs)
-            #obs, reward, done, info = ai.step(action)
-            #print(f"Observation: {obs}, Reward: {reward}, actual: {info["actual"]}, expected: {info["expected"]}")
-            result = self.target_function()
-            results.append(result)
+        self.input = None
+
+        while True:
+            testInfo = {}
+            try:
+                line = next(self.inputGenerator).split(":")
+            except StopIteration:
+                break
+
+            self.input = chess.Board(line[0])
+            self.expected_output = float(line[1])
+            result = self.target_function(self.input)
+            testInfo["actualResult"] = result
+            results.append(testInfo)
+
+        logging.info(f"test results:")
+        for element in results:
+            logging.info(f"\t{element}")
 
 if __name__ == '__main__':
-    ai = Qlearning(positionCalculator)
-    model = DQN("MlpPolicy", ai, verbose=1)
-    print("WORKING")
+    ai = None
+    model = None
+    modelPath = "/app/model/qlearning.zip"
 
-    ai.startTraining()
-    ai.startTesting()
+    try:
+
+        if os.path.exists(modelPath):
+            with open("/app/model/ai.pkl", "rb") as f:
+                ai = pickle.load(f)
+            model = DQN.load(modelPath, env=ai)
+        else:
+            ai = Qlearning(positionCalculator)
+            model = DQN("MlpPolicy", ai, verbose=1)
+        print("WORKING")
+
+        ai.startTraining()
+        ai.startTesting()
+
+    except Exception as e:
+        logger.info(f"Error {e}")
+        logger.info(f"Input: {ai.inputChanges}")
+        logger.info(f"Episode: {ai.episodeChangesDone}")
+    model.save(modelPath)
+    with open("/app/model/ai.pkl", "wb") as f:
+        ai.inputGenerator = None
+        pickle.dump(ai, f)
+
 

@@ -1,16 +1,55 @@
+import multiprocessing
 import os
 import random
+import time
 
 import chess
 import chess.pgn
 from globals import PGN_FILE, PGN_PATH
+from src.stockfish import getExpectedResult
 
+def afterProcessFile(fenList, counter):
+    global trainingFilesCreated, testingFilesCreated, processes
 
-def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0):
-    with open(os.path.abspath(os.path.join(os.getcwd(), file)), "r") as f:
+    while len(processes) >= maxProcesses:
+        for process in processes[:]:  # Iterate over a copy of the list
+            if not process.is_alive():  # Check if the process has finished
+                process.join()  # Ensure the process has completely terminated
+                processes.remove(process)  # Remove the completed process
+        time.sleep(0.1)  # Add a small delay to prevent busy-waiting
+
+    if counter % 2 == 1:
+        trainingFilesCreated += 1
+        path = f"training/{trainingFilesCreated}"
+    else:
+        testingFilesCreated += 1
+        path = f"testing/{testingFilesCreated}"
+    process = multiprocessing.Process(target=addExpectedValue, args=(fenList, path))
+    processes.append(process)
+    process.start()
+
+def calculatedExpectedValue(fens):
+    return [fen + ":" + str(getExpectedResult(chess.Board(fen))) + "\n" for fen in fens]
+
+def addExpectedValue(lines, path):
+    n = 4
+    chunk_size = len(lines) // n
+    chunks = [lines[i * chunk_size : (i + 1) * chunk_size] for i in range(n - 1)] + [lines[(n - 1) * chunk_size:]]
+
+    with multiprocessing.Pool(processes=4) as pool:
+        modifiedLines = pool.map(calculatedExpectedValue, chunks)
+
+    flattenedLines = [item for sublist in modifiedLines for item in sublist]
+    with open(os.getenv("BASE_PATH") + "temp", "w") as file:
+        for line in flattenedLines:
+            file.write(line)
+    os.rename(os.getenv("BASE_PATH") + "temp", os.getenv("BASE_PATH") + path)
+
+def extractGames(file, gamesPerFile, amountOfFilesToCreate, startValue=0):
+    with open(os.path.abspath(os.path.join(os.getenv("BASE_PATH"), file)), "r") as f:
         filesCreated = 0
         count = 0
-        output = None
+        output = []
         game = None
         while count < startValue:
             game = chess.pgn.read_game(f)
@@ -20,20 +59,19 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0
         if game is None and count > 0:
             return ValueError("Start value is out of bounds.")
         count = 0
-        if output is None:
-            filesCreated += 1
-            output = open(PGN_PATH + naming + str(filesCreated), "w")
+
         while True:
             if count == gamesPerFile:
-                output.close()
                 filesCreated += 1
-                if filesCreated > amountOfFilesToCreate:
+                if amountOfFilesToCreate != 0 and filesCreated > amountOfFilesToCreate:
                     break
-                output = open(PGN_PATH + naming + str(filesCreated), "w")
+                afterProcessFile(output, filesCreated)
+                output = []
                 count = 0
             game = chess.pgn.read_game(f)
             if game is None:
-                break
+                #TODO remove last output file since it isn't filled correctly
+                return amountOfFilesToCreate - filesCreated
             node = game
             positions = []
             while not node.is_end():
@@ -43,8 +81,25 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, naming, startValue=0
                     positions.append(board.fen())
             if positions:
                 randomFen = random.choice(positions)
-                output.write(str(randomFen)+"\n")
+                output.append(str(randomFen))
             count += 1
+    return 0
 
-extractGames(PGN_FILE, 1024, 5, "training/")
-extractGames(PGN_FILE, 1024, 5, "testing/", 1024*5)
+if __name__ == "__main__":
+    numProcesses = 2
+    testFilesNeeded = 5
+    trainingFilesNeeded = 5
+    processes = []
+    maxProcesses = 4
+    trainingFilesCreated = 0
+    testingFilesCreated = 0
+    folders = ["training/", "testing/"]
+    basePath = os.getenv("BASE_PATH")
+
+    for folder in folders:
+        if not os.path.exists(basePath + folder):
+            os.mkdir(basePath + folder)
+
+    filesLeft = extractGames(PGN_FILE, 10, testFilesNeeded + trainingFilesNeeded)
+    if filesLeft > 0: # replace with getting a new file
+        raise Exception("There are " + str(filesLeft) + " files left.")

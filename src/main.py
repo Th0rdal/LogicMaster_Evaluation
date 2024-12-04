@@ -31,6 +31,16 @@ def runContainer(imageName, container_name, loggingBase):
         image=imageName,
         name=container_name,
         detach=True,
+        volumes={
+            host_folder: {
+                'bind': container_folder,
+                'mode': 'ro'  # Can be 'ro' for read-only or 'rw' for read-write
+            },
+            save_folder : {
+                'bind': "/app/model/",
+                'mode': "rw"
+            }
+        }
     )
 
     with open(loggingPath, "w", encoding="utf-8") as file:
@@ -53,6 +63,11 @@ if __name__ == "__main__":
     board = chess.Board(fen)
     logger.info("TEST")
 
+    host_folder = os.path.abspath("../resources/inputData")
+    save_folder = os.path.abspath("../resources/models/qlearning")
+    container_folder = "/app/resources"
+
+
     thread1 = threading.Thread(target=runContainer, args=("qlearning", "container-instance-1", AI_LOGGING_PATH))
     #thread2 = threading.Thread(target=run_container_and_stream_logs, args=("testimage", "container-instance-2"))
 
@@ -60,5 +75,15 @@ if __name__ == "__main__":
     thread1.start()
     #thread2.start()
 
+    container = client.containers.run(
+        "preprocessing",
+        detach=True,  # Run container in detached mode
+        volumes={
+            host_folder : {
+                'bind': container_folder,
+                'mode': 'rw'  # Can be 'ro' for read-only or 'rw' for read-write
+            }
+        }
+    )
     # docker build -t ai_base -f .\dockerfile_ai_base .
     # docker build -t qlearning -f dockerfile_qlearning .
