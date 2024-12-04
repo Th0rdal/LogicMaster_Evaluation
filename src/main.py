@@ -71,7 +71,7 @@ if __name__ == "__main__":
     container_folder = "/app/resources"
 
 
-    thread1 = threading.Thread(target=runContainer, args=("qlearning", "container-instance-1", AI_LOGGING_PATH))
+    thread1 = threading.Thread(target=runContainer, args=("qlearning", "qlearning", AI_LOGGING_PATH))
     #thread2 = threading.Thread(target=run_container_and_stream_logs, args=("testimage", "container-instance-2"))
 
     # Start the threads
