@@ -5,6 +5,8 @@ import docker
 from datetime import datetime
 
 import chess.engine
+from dotenv import dotenv_values
+
 from src.globals import LOG_PATH, AI_LOGGING_PATH
 
 # Initialize the Docker client
@@ -40,7 +42,8 @@ def runContainer(imageName, container_name, loggingBase):
                 'bind': "/app/model/",
                 'mode': "rw"
             }
-        }
+        },
+        environment=dotenv_values(".env")
     )
 
     with open(loggingPath, "w", encoding="utf-8") as file:
@@ -83,7 +86,8 @@ if __name__ == "__main__":
                 'bind': container_folder,
                 'mode': 'rw'  # Can be 'ro' for read-only or 'rw' for read-write
             }
-        }
+        },
+        environment=dotenv_values(".env")
     )
     # docker build -t ai_base -f .\dockerfile_ai_base .
     # docker build -t qlearning -f dockerfile_qlearning .

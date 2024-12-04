@@ -5,3 +5,4 @@ stable-baselines3
 numpy
 gym
 shimmy
+python_dotenv==1.0.0

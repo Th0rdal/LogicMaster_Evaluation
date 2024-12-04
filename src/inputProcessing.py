@@ -1,7 +1,8 @@
-import logging
 import os
 import time
 import logging
+
+from src.exceptions.StopSignalSentException import StopSignalSentException
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,11 @@ class InputProcessor:
             time.sleep(0.1)
         with open(self.currentPath) as file:
             for line in file:
-                yield line.strip()
+                l = line.strip()
+                if l == "!STOP!":
+                    raise StopSignalSentException("Stop signal sent!") #TODO make custom
+                else:
+                    yield l
                 self.boardCounter += 1
         return None
 

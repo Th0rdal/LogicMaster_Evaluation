@@ -10,3 +10,4 @@ COPY src/params.py ./src/params.py
 COPY src/globals.py ./src/globals.py
 COPY src/stockfish.py ./src/stockfish.py
 COPY src/inputProcessing.py ./src/inputProcessing.py
+COPY src/exceptions/ ./src/exceptions/

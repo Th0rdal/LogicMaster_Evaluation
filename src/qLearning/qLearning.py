@@ -11,9 +11,9 @@ import logging
 
 from stable_baselines3.common.callbacks import BaseCallback
 
+from src.exceptions import StopSignalSentException
 from src.factors.position_calculator import positionCalculator
 from src.params import Params
-from src.stockfish import getExpectedResult
 from src.inputProcessing import InputProcessor
 """
 import os
@@ -47,11 +47,6 @@ def print_directory_tree(start_path, level=0):
 
 print_directory_tree("/app")"""
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',
-                    handlers=[logging.StreamHandler(sys.stdout)])
-
-logger = logging.getLogger(__name__)
 
 class StopTrainingCallback(BaseCallback):
     def _on_step(self) -> bool:
@@ -68,12 +63,7 @@ class StopTrainingCallback(BaseCallback):
 
 class Qlearning(gym.Env):
 
-    metadata = {
-        "threshold": 0.01,
-        "maxActionsPerBoard" : 50,
-        "boardsPerEpoch" : 10,
-        "learning_rate" : 0.001
-    }
+    metadata = {}
     stateToBits = {-1: 1, 0: 0, 1: 2}
     bitsToState = {1: -1, 0: 0, 2: 1}
 
@@ -102,13 +92,12 @@ class Qlearning(gym.Env):
         self.stepChanges = {}
         self.inputChanges = {}
 
-    def encodeAction(self):
-        actionIndex = 0
-        for i, p in enumerate(Params.params):
-            actionIndex += self.stateToBits[p.value] * (3 ** i)
-        return actionIndex
-
     def decodeAction(self, encodedAction):
+        """
+        Decodes the action of the model. The action is defined as an integer, which is being decoded.
+        @param encodedAction: The encoded action taken by the model
+        @return: The decoded action (list of elements containing how each param should be adjusted)
+        """
         params = []
         for _ in range(Params.totalParameter):
             params.append(self.bitsToState[encodedAction % 3])
@@ -116,6 +105,14 @@ class Qlearning(gym.Env):
         return params
 
     def step(self, action):
+        """
+        This is a single step taken during training. A step is a single action taken by the AI.
+
+        Each board give the model metadata["maxActionsPerBoard"] actions per board.
+        Each board contains metadata["boardsPerEpoch"] boards per epoch.
+        @param action: The action the model took (= changes to do to the params)
+        @return: observation, reward, done, info (defined by the model)
+        """
         self.stepChanges = {}
         self.stepChanges = {"action": action}
 
@@ -159,6 +156,11 @@ class Qlearning(gym.Env):
         return observation, reward, done, self.stepChanges
 
     def reset(self, **kwargs):
+        """
+        Handles resetting all needed values to allow for a new training board.
+        @param kwargs:
+        @return:
+        """
         for element in Params.params:
             element += np.random.uniform(-5, 5)
 
@@ -171,6 +173,10 @@ class Qlearning(gym.Env):
         return np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
 
     def loadNewInput(self):
+        """
+        Loads a new board during a training episode. Also creates a new inputChanges object to receive the results.
+        @return: True if there is no new board and the episode is finished, else false
+        """
         self.inputChanges = {}
 
         try:
@@ -190,21 +196,32 @@ class Qlearning(gym.Env):
         return False
 
     def getInput(self, boardType):
+        """
+        Configures the inputProcessing object and loads the next board.
+        @param boardType: training if it should load training. Testing if it should load teseting
+        @return: None
+        """
         self.inputProcessor.loadNextSet(boardType)
         self.inputGenerator = self.inputProcessor.getInputBoard()
 
-    def startTraining(self, skipIndex=0):
+    def startTraining(self):
+        """
+        Handles the training for a single episode. Results will be logged in the logger
+        @return: None
+        """
         logger.info("Starting training!")
         logger.info(f"Episode {self.inputProcessor.index}")
 
 
         ai.getInput("training")
-        for _ in range(skipIndex):
-            next(self.inputGenerator)
         model.learn(total_timesteps=self.metadata["boardsPerEpoch"] * self.metadata["maxActionsPerBoard"],
                     callback = StopTrainingCallback(verbose=1))
 
     def startTesting(self):
+        """
+        Handles the testing for a single episode. Results will be logged in the logger.
+        @return: None
+        """
         logger.info("Starting testing!")
         logger.info(f"Episode {self.inputProcessor.index}")
 
@@ -229,32 +246,72 @@ class Qlearning(gym.Env):
         for element in results:
             logging.info(f"\t{element}")
 
+    def loadEnvVars(self):
+        """
+        Loads metadata dict with the needed environment variables.
+        @return:
+        """
+        try:
+            self.metadata["threshold"] = float(os.getenv("THRESHOLD"))
+            self.metadata["maxActionsPerBoard"] = int(os.getenv("MAX_ACTIONS_PER_BOARD"))
+            self.metadata["boardsPerEpoch"] = int(os.getenv("BOARDS_PER_EPOCH"))
+            self.metadata["learning_rate"] = self.metadata["LEARNING_RATE"]
+        except ValueError as e:
+            logging.error(f"Error: {e}")
+
+    def startLoop(self):
+        """
+        This is the main loop of the training/testing of the model
+        @return: None
+        """
+        logger.info("Loading env variables")
+        self.loadEnvVars()
+
+        logger.info("Starting model loop!")
+        try:
+            self.startTraining()
+            self.startTesting()
+        except StopSignalSentException as e:
+            logger.info(e)
+        except Exception as e:
+            logger.error(f"Error {e}")
+            logger.info(f"Input: {ai.inputChanges}")
+            logger.info(f"Episode: {ai.episodeChangesDone}")
+        model.save(modelPath)
+        with open("/app/model/ai.pkl", "wb") as f:
+            ai.inputGenerator = None
+            pickle.dump(ai, f)
+
+
 if __name__ == '__main__':
     ai = None
     model = None
     modelPath = "/app/model/qlearning.zip"
 
-    try:
+    # configure logging. LOGGING_LEVEL env set to DEBUG will result in debug logging
+    # logging level must be set to INFO at least for results to be printed
+    level = logging.INFO
+    if os.getenv("LOGGING_LEVEL") == "DEBUG":
+        level = logging.DEBUG
+    logging.basicConfig(level=level,
+                        format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',
+                        handlers=[logging.StreamHandler(sys.stdout)])
+    logger = logging.getLogger(__name__)
 
+    # load model or create new one if no model has been created
+    try:
         if os.path.exists(modelPath):
             with open("/app/model/ai.pkl", "rb") as f:
                 ai = pickle.load(f)
             model = DQN.load(modelPath, env=ai)
+            logger.info("Loaded model successfully!")
         else:
+            logger.info("No model found. Creating new model!")
             ai = Qlearning(positionCalculator)
             model = DQN("MlpPolicy", ai, verbose=1)
-        print("WORKING")
-
-        ai.startTraining()
-        ai.startTesting()
+            logger.info("Model created successfully!")
 
     except Exception as e:
-        logger.info(f"Error {e}")
-        logger.info(f"Input: {ai.inputChanges}")
-        logger.info(f"Episode: {ai.episodeChangesDone}")
-    model.save(modelPath)
-    with open("/app/model/ai.pkl", "wb") as f:
-        ai.inputGenerator = None
-        pickle.dump(ai, f)
+        logger.error(f"Error {e}")
 
 
