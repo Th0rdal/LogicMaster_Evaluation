@@ -6,7 +6,7 @@ class Params:
     totalParameter = 44
 
     # actual list of parameter
-    params = np.random.uniform(2, -2, size=totalParameter).astype(np.float64)
+    params = np.random.uniform(5, -5, size=totalParameter).astype(np.float64)
     #util
     maxMaterialValueEndgame = lambda: Params.params[0]
 
@@ -76,3 +76,7 @@ class Params:
     backRankPenaltyValue = lambda: Params.params[41]
     promotionScoreBonusValue = lambda: Params.params[42]
     promotionPossibilityBonusValue = lambda: Params.params[43]
+
+    @classmethod
+    def reset(cls):
+        cls.params = np.random.uniform(5, -5, size=cls.totalParameter).astype(np.float64)

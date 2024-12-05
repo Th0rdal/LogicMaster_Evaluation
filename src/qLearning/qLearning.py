@@ -11,7 +11,7 @@ import logging
 
 from stable_baselines3.common.callbacks import BaseCallback
 
-from src.exceptions import StopSignalSentException
+from src.exceptions.StopSignalSentException import StopSignalSentException
 from src.factors.position_calculator import positionCalculator
 from src.params import Params
 from src.inputProcessing import InputProcessor
@@ -113,6 +113,7 @@ class Qlearning(gym.Env):
         @param action: The action the model took (= changes to do to the params)
         @return: observation, reward, done, info (defined by the model)
         """
+
         self.stepChanges = {}
         self.stepChanges = {"action": action}
 
@@ -125,7 +126,7 @@ class Qlearning(gym.Env):
 
         # run function and return actual and expected output
         actualResult = self.target_function(self.input)
-        logging.info(f"actual: {actualResult}")
+        logger.info(f"actual: {actualResult}")
         self.stepChanges["actualResult"] = actualResult
 
         #calculate error and reward
@@ -161,8 +162,7 @@ class Qlearning(gym.Env):
         @param kwargs:
         @return:
         """
-        for element in Params.params:
-            element += np.random.uniform(-5, 5)
+        Params.reset()
 
         self.episodeChangesDone = []
         self.inputChanges = {}
@@ -242,9 +242,9 @@ class Qlearning(gym.Env):
             testInfo["actualResult"] = result
             results.append(testInfo)
 
-        logging.info(f"test results:")
+        logger.info(f"test results:")
         for element in results:
-            logging.info(f"\t{element}")
+            logger.info(f"\t{element}")
 
     def loadEnvVars(self):
         """
@@ -255,9 +255,10 @@ class Qlearning(gym.Env):
             self.metadata["threshold"] = float(os.getenv("THRESHOLD"))
             self.metadata["maxActionsPerBoard"] = int(os.getenv("MAX_ACTIONS_PER_BOARD"))
             self.metadata["boardsPerEpoch"] = int(os.getenv("BOARDS_PER_EPOCH"))
-            self.metadata["learning_rate"] = self.metadata["LEARNING_RATE"]
+            self.metadata["learning_rate"] = float(os.getenv("LEARNING_RATE"))
         except ValueError as e:
-            logging.error(f"Error: {e}")
+            logger.error(f"Error: {e}")
+        logging.info("Loaded env variables successfully!")
 
     def startLoop(self):
         """
@@ -298,6 +299,11 @@ if __name__ == '__main__':
                         handlers=[logging.StreamHandler(sys.stdout)])
     logger = logging.getLogger(__name__)
 
+    #os.environ["THRESHOLD"] = "0.01"
+    #os.environ["MAX_ACTIONS_PER_BOARD"] = "50"
+    #os.environ["BOARDs_PER_EPOCH"] = "10"
+    #os.environ["LEARNING_RATE"] = "0.001"
+
     # load model or create new one if no model has been created
     try:
         if os.path.exists(modelPath):
@@ -310,6 +316,7 @@ if __name__ == '__main__':
             ai = Qlearning(positionCalculator)
             model = DQN("MlpPolicy", ai, verbose=1)
             logger.info("Model created successfully!")
+        ai.startLoop()
 
     except Exception as e:
         logger.error(f"Error {e}")

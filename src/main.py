@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 def runContainer(imageName, container_name, loggingBase):
     client = docker.from_env()
 
+    save_folder = os.path.abspath("../resources/models/" + imageName)
     loggingPath = loggingBase + imageName + "/" + imageName + "_logs_" + str(currentTime) + ".txt"
 
     # Run the container
@@ -38,12 +39,12 @@ def runContainer(imageName, container_name, loggingBase):
                 'bind': container_folder,
                 'mode': 'ro'  # Can be 'ro' for read-only or 'rw' for read-write
             },
-            save_folder : {
+            save_folder: {
                 'bind': "/app/model/",
                 'mode': "rw"
             }
         },
-        environment=dotenv_values(".env")
+        environment=dotenv_values("../.env")
     )
 
     with open(loggingPath, "w", encoding="utf-8") as file:
@@ -67,16 +68,16 @@ if __name__ == "__main__":
     logger.info("TEST")
 
     host_folder = os.path.abspath("../resources/inputData")
-    save_folder = os.path.abspath("../resources/models/qlearning")
+
     container_folder = "/app/resources"
 
 
     thread1 = threading.Thread(target=runContainer, args=("qlearning", "qlearning", AI_LOGGING_PATH))
-    #thread2 = threading.Thread(target=run_container_and_stream_logs, args=("testimage", "container-instance-2"))
+    thread2 = threading.Thread(target=runContainer, args=("ppo", "ppo", AI_LOGGING_PATH))
 
     # Start the threads
     thread1.start()
-    #thread2.start()
+    thread2.start()
 
     container = client.containers.run(
         "preprocessing",
@@ -85,9 +86,9 @@ if __name__ == "__main__":
             host_folder : {
                 'bind': container_folder,
                 'mode': 'rw'  # Can be 'ro' for read-only or 'rw' for read-write
-            }
+            },
         },
-        environment=dotenv_values(".env")
+        environment=dotenv_values("../.env")
     )
     # docker build -t ai_base -f .\dockerfile_ai_base .
     # docker build -t qlearning -f dockerfile_qlearning .
