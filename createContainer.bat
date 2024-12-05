@@ -45,6 +45,19 @@ IF %ERRORLEVEL% NEQ 0 (
     set success_builds=!success_builds!qlearning,
 )
 
+REM Step 4: Build the Docker image qlearning
+echo Starting ppo build...
+docker build -t ppo -f .\dockerfile_ppo .
+IF %ERRORLEVEL% NEQ 0 (
+    REM Error in red
+    echo ^[[31mppo build failed!^[[0m
+    set failed_builds=!failed_builds!ppo,
+) ELSE (
+    REM Success in green
+    echo ^[[32mppo build succeeded!^[[0m
+    set success_builds=!success_builds!ppo,
+)
+
 REM Final Results
 echo.
 echo --- Build Results ---
