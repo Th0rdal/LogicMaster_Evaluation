@@ -8,45 +8,12 @@ from gym import spaces
 import numpy as np
 from stable_baselines3 import DQN
 import logging
-
 from stable_baselines3.common.callbacks import BaseCallback
 
 from src.exceptions.StopSignalSentException import StopSignalSentException
 from src.factors.position_calculator import positionCalculator
 from src.params import Params
 from src.inputProcessing import InputProcessor
-"""
-import os
-
-
-def print_directory_tree(start_path, level=0):
-    try:
-        # Print the current directory
-        indent = " " * (level * 4)  # Indentation for subdirectories
-        print(f"{indent}{os.path.basename(start_path)}/")
-
-        # List all items in the current directory
-        for entry in os.listdir(start_path):
-            entry_path = os.path.join(start_path, entry)
-            if os.path.isdir(entry_path):
-                # Recurse into subdirectory
-                print_directory_tree(entry_path, level + 1)
-            else:
-                # Print file with appropriate indentation
-                print(f"{indent}    {entry}")
-    except PermissionError:
-        # Skip directories/files you don't have permissions for
-        print(f"{indent}    [Permission Denied]")
-    except FileNotFoundError:
-        # Skip directories that might disappear during traversal
-        print(f"{indent}    [File Not Found]")
-    except Exception as e:
-        # Catch all other errors
-        print(f"{indent}    [Error: {e}]")
-
-
-print_directory_tree("/app")"""
-
 
 class StopTrainingCallback(BaseCallback):
     def _on_step(self) -> bool:
@@ -64,8 +31,7 @@ class StopTrainingCallback(BaseCallback):
 class Qlearning(gym.Env):
 
     metadata = {}
-    stateToBits = {-1: 1, 0: 0, 1: 2}
-    bitsToState = {1: -1, 0: 0, 2: 1}
+    bitsToState = {0: -1, 1: 1}
 
     def __init__(self, targetFunction):
         super(Qlearning, self).__init__()
@@ -75,14 +41,14 @@ class Qlearning(gym.Env):
         self.currentActionCount = 0
         self.inputGenerator = None
         self.inputProcessor = InputProcessor()
-        self.action_space = spaces.Discrete(3 ** 5)
+        self.action_space = spaces.Discrete(2 ** 7 - 1)
 
         # create observation space. It defines the state space that the environment provides to the agent.
         # Each param is constrained between -10 and 10 with a possible error of -inf to inf.
         self.observation_space = spaces.Box(
-            low = np.array([[-10] * 5 + [-float('inf')]]),
-            high = np.array([[10] * 5 + [float('inf')]]),
-            dtype = np.float32
+            low = np.array([[-10] * Params.totalParameter + [-float('inf')]]),
+            high = np.array([[10] * Params.totalParameter + [float('inf')]]),
+            dtype = np.float64
         )
 
         self.target_function = targetFunction
@@ -95,13 +61,17 @@ class Qlearning(gym.Env):
     def decodeAction(self, encodedAction):
         """
         Decodes the action of the model. The action is defined as an integer, which is being decoded.
+
+        An action is in the range of 0 and 2^7-1. The first 6 bits are an encoded form of the parameter to change.
+        The last bit reflects the action to do with the selected param.
         @param encodedAction: The encoded action taken by the model
         @return: The decoded action (list of elements containing how each param should be adjusted)
         """
-        params = []
-        for _ in range(Params.totalParameter):
-            params.append(self.bitsToState[encodedAction % 3])
-            encodedAction //= 3
+        params = [0] * Params.totalParameter
+        param = encodedAction & (2 ** Params.totalParameter - 1) # get the first 6 bites which encode the parameter
+        changeBit = (encodedAction >> Params.totalParameter) & 0b1
+        if param < Params.totalParameter:
+            params[param] = self.bitsToState[changeBit]
         return params
 
     def step(self, action):
@@ -136,7 +106,7 @@ class Qlearning(gym.Env):
         self.stepChanges["error"] = self.current_error
         self.stepChanges["reward"] = reward
 
-        observation = np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
+        observation = np.concatenate([Params.params, np.array([self.current_error])])
         self.stepChanges["observation"] = observation
 
         done = self.current_error < self.metadata["threshold"]
@@ -170,7 +140,7 @@ class Qlearning(gym.Env):
 
         self.loadNewInput()
 
-        return np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
+        return np.concatenate((Params.params, np.array([self.current_error])))
 
     def loadNewInput(self):
         """
@@ -274,10 +244,10 @@ class Qlearning(gym.Env):
             self.startTesting()
         except StopSignalSentException as e:
             logger.info(e)
-        except Exception as e:
-            logger.error(f"Error {e}")
-            logger.info(f"Input: {ai.inputChanges}")
-            logger.info(f"Episode: {ai.episodeChangesDone}")
+        #except Exception as e:
+        #    logger.error(f"Error {e}")
+        #    logger.info(f"Input: {ai.inputChanges}")
+        #    logger.info(f"Episode: {ai.episodeChangesDone}")
         model.save(modelPath)
         with open("/app/model/ai.pkl", "wb") as f:
             ai.inputGenerator = None
@@ -299,10 +269,10 @@ if __name__ == '__main__':
                         handlers=[logging.StreamHandler(sys.stdout)])
     logger = logging.getLogger(__name__)
 
-    #os.environ["THRESHOLD"] = "0.01"
-    #os.environ["MAX_ACTIONS_PER_BOARD"] = "50"
-    #os.environ["BOARDs_PER_EPOCH"] = "10"
-    #os.environ["LEARNING_RATE"] = "0.001"
+    os.environ["THRESHOLD"] = "0.01"
+    os.environ["MAX_ACTIONS_PER_BOARD"] = "50"
+    os.environ["BOARDs_PER_EPOCH"] = "10"
+    os.environ["LEARNING_RATE"] = "0.001"
 
     # load model or create new one if no model has been created
     try:
@@ -318,7 +288,7 @@ if __name__ == '__main__':
             logger.info("Model created successfully!")
         ai.startLoop()
 
-    except Exception as e:
+    except StopSignalSentException as e:
         logger.error(f"Error {e}")
 
 

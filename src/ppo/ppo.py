@@ -39,8 +39,8 @@ class Ppo(gym.Env):
         self.target_function = targetFunction
         self.action_space = spaces.Box(low=-10, high=10, shape=(Params.totalParameter,), dtype=np.float64)
         self.observation_space = spaces.Box(
-            low=np.array([-10] * 5 + [-float('inf')]),
-            high=np.array([10] * 5 + [float('inf')]),
+            low=np.array([-10] * Params.totalParameter + [-float('inf')]),
+            high=np.array([10] * Params.totalParameter + [float('inf')]),
             dtype=np.float32
         )
         self.currentActionCount = 0
@@ -82,7 +82,7 @@ class Ppo(gym.Env):
         self.stepChanges["error"] = self.current_error
         self.stepChanges["reward"] = reward
 
-        observation = np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
+        observation = np.concatenate((Params.params, np.array([self.current_error])))
         self.stepChanges["observation"] = observation
 
         done = self.current_error < self.metadata["threshold"]
@@ -117,7 +117,7 @@ class Ppo(gym.Env):
 
         self.loadNewInput()
 
-        return np.concatenate((np.array(Params.params[:5]), np.array([self.current_error])))
+        return np.concatenate((Params.params, np.array([self.current_error])))
 
     def loadNewInput(self):
         """
