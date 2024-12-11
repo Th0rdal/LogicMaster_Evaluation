@@ -8,7 +8,7 @@ import chess
 import gym
 import numpy as np
 from gym import spaces
-from stable_baselines3 import PPO, DQN
+from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback
 
 from src.exceptions.StopSignalSentException import StopSignalSentException

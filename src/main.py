@@ -13,7 +13,7 @@ from src.globals import LOG_PATH, AI_LOGGING_PATH
 client = docker.from_env()
 if not os.path.exists(LOG_PATH):
     os.makedirs(os.path.dirname(LOG_PATH))
-for ai in ["qlearning/", "ppo/", "ddgp/"]:
+for ai in ["qlearning/", "ppo/", "ddpg/"]:
     if not os.path.exists(AI_LOGGING_PATH+ai):
         os.makedirs(os.path.dirname(AI_LOGGING_PATH+ai))
 
@@ -61,26 +61,12 @@ def runContainer(imageName, container_name, loggingBase):
             container.remove()
             file.write(f"Container {container_name} stopped and removed.")
 
-
-if __name__ == "__main__":
-    fen = "r1bqkbnr/pppppppp/n7/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 1"  # Example position
-    board = chess.Board(fen)
-    logger.info("TEST")
-
-    host_folder = os.path.abspath("../resources/inputData")
-
-    container_folder = "/app/resources"
-
-
-    thread1 = threading.Thread(target=runContainer, args=("qlearning", "qlearning", AI_LOGGING_PATH))
-    thread2 = threading.Thread(target=runContainer, args=("ppo", "ppo", AI_LOGGING_PATH))
-
-    # Start the threads
-    thread1.start()
-    thread2.start()
+def runPreprocessing():
+    loggingPath = LOG_PATH + "/" + "preprocessing/preprocessing_logs_" + str(currentTime) + ".txt"
+    container_name = "preprocessing"
 
     container = client.containers.run(
-        "preprocessing",
+        container_name,
         detach=True,  # Run container in detached mode
         volumes={
             host_folder : {
@@ -90,5 +76,42 @@ if __name__ == "__main__":
         },
         environment=dotenv_values("../.env")
     )
+
+    with open(loggingPath, "w", encoding="utf-8") as file:
+        file.write(f"Container {container_name} started with ID {container.id}")
+
+        # Stream logs
+        try:
+            for log_line in container.logs(stream=True):
+                file.write(f"[{container_name}] {log_line.decode('utf-8')}")
+        finally:
+            # Stop and remove the container
+            file.write(f"\nStopping and removing {container_name}...")
+            container.stop()
+            container.remove()
+            file.write(f"Container {container_name} stopped and removed.")
+
+if __name__ == "__main__":
+    fen = "r1bqkbnr/pppppppp/n7/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 1"  # Example position
+    board = chess.Board(fen)
+    logger.info("TEST")
+
+    host_folder = os.path.abspath("../resources/inputData")
+
+    container_folder = "/app/resources/"
+
+
+    thread1 = threading.Thread(target=runContainer, args=("qlearning", "qlearning", AI_LOGGING_PATH))
+    thread2 = threading.Thread(target=runContainer, args=("ppo", "ppo", AI_LOGGING_PATH))
+    thread3 = threading.Thread(target=runContainer, args=("ddpg", "ddpg", AI_LOGGING_PATH))
+    thread4 = threading.Thread(target=runPreprocessing)
+
+    # Start the threads
+    thread1.start()
+    thread2.start()
+    thread3.start()
+    thread4.start()
+
+
     # docker build -t ai_base -f .\dockerfile_ai_base .
     # docker build -t qlearning -f dockerfile_qlearning .

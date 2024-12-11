@@ -58,6 +58,19 @@ IF %ERRORLEVEL% NEQ 0 (
     set success_builds=!success_builds!ppo,
 )
 
+REM Step 5: Build the Docker image qlearning
+echo Starting ddpg build...
+docker build -t ddpg -f .\dockerfile_ddpg .
+IF %ERRORLEVEL% NEQ 0 (
+    REM Error in red
+    echo ^[[31mddpg build failed!^[[0m
+    set failed_builds=!failed_builds!ddpg,
+) ELSE (
+    REM Success in green
+    echo ^[[32mddpg build succeeded!^[[0m
+    set success_builds=!success_builds!ddpg,
+)
+
 REM Final Results
 echo.
 echo --- Build Results ---

@@ -6,7 +6,7 @@ COPY ai_requirements.txt .
 RUN pip install -r ai_requirements.txt
 
 # Copy your source code into the container
-COPY src/ppo/ppo.py ./ppo.py
+COPY src/ddpg/ddpg.py ./ddpg.py
 
 # Command to run your Python AI program
-CMD ["python", "-m", "ppo"]
+CMD ["python", "-m", "ddpg"]

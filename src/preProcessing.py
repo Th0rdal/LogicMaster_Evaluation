@@ -86,6 +86,7 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, startValue=0):
     return 0
 
 if __name__ == "__main__":
+
     numProcesses = 2
     testFilesNeeded = 5
     trainingFilesNeeded = 5
