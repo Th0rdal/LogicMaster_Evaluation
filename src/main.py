@@ -94,7 +94,6 @@ def runPreprocessing():
 if __name__ == "__main__":
     fen = "r1bqkbnr/pppppppp/n7/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 1"  # Example position
     board = chess.Board(fen)
-    logger.info("TEST")
 
     host_folder = os.path.abspath("../resources/inputData")
 
@@ -110,7 +109,7 @@ if __name__ == "__main__":
     thread1.start()
     thread2.start()
     thread3.start()
-    thread4.start()
+    #thread4.start()
 
 
     # docker build -t ai_base -f .\dockerfile_ai_base .

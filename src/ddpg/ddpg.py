@@ -214,15 +214,18 @@ class Ddpg(gym.Env):
         self.loadEnvVars()
 
         logger.info("Starting model loop!")
-        try:
-            self.startTraining()
-            self.startTesting()
-        except StopSignalSentException as e:
-            logger.info(e)
-        except Exception as e:
-            logger.error(f"Error {e}")
-            logger.info(f"Input: {ai.inputChanges}")
-            logger.info(f"Episode: {ai.episodeChangesDone}")
+        while True:
+            try:
+                self.startTraining()
+                self.startTesting()
+            except StopSignalSentException as e:
+                logger.info(e)
+                break
+            except Exception as e:
+                logger.error(f"Error {e}")
+                logger.info(f"Input: {ai.inputChanges}")
+                logger.info(f"Episode: {ai.episodeChangesDone}")
+                break
         model.save(modelPath)
         with open("/app/model/ai.pkl", "wb") as f:
             ai.inputGenerator = None

@@ -45,9 +45,9 @@ def addExpectedValue(lines, path):
             file.write(line)
     os.rename(os.getenv("BASE_PATH") + "temp", os.getenv("BASE_PATH") + path)
 
-def extractGames(file, gamesPerFile, amountOfFilesToCreate, startValue=0):
+def extractGames(file, gamesPerFile, amountOfFilesToCreate, filesAlreadyCreated=0, startValue=0):
     with open(os.path.abspath(os.path.join(os.getenv("BASE_PATH"), file)), "r") as f:
-        filesCreated = 0
+        filesCreated = filesAlreadyCreated
         count = 0
         output = []
         game = None
@@ -101,6 +101,17 @@ if __name__ == "__main__":
         if not os.path.exists(basePath + folder):
             os.mkdir(basePath + folder)
 
-    filesLeft = extractGames(PGN_FILE, 10, testFilesNeeded + trainingFilesNeeded)
+    entries = os.listdir(os.path.abspath(os.path.join(os.getenv("BASE_PATH"), folders[0])))
+    largestNumber = 0
+    if entries:
+        for entry in entries:
+            try:
+                number = int(entry)
+                if largestNumber < number:
+                    largestNumber = number
+            except ValueError:
+                continue
+
+    filesLeft = extractGames(PGN_FILE, 10, testFilesNeeded + trainingFilesNeeded + largestNumber, largestNumber)
     if filesLeft > 0: # replace with getting a new file
         raise Exception("There are " + str(filesLeft) + " files left.")

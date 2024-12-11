@@ -6,7 +6,7 @@ class Params:
     totalParameter = 44
 
     # actual list of parameter
-    params = np.random.uniform(5, -5, size=totalParameter).astype(np.float64)
+    params = np.zeros(totalParameter)
     #util
     maxMaterialValueEndgame = lambda: Params.params[0]
 

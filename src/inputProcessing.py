@@ -30,6 +30,7 @@ class InputProcessor:
             for line in file:
                 l = line.strip()
                 if l == "!STOP!":
+                    logging.info("Stop signal sent!")
                     raise StopSignalSentException("Stop signal sent!")
                 else:
                     yield l
