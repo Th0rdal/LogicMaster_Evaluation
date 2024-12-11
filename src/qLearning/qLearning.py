@@ -271,10 +271,10 @@ if __name__ == '__main__':
                         handlers=[logging.StreamHandler(sys.stdout)])
     logger = logging.getLogger(__name__)
 
-    os.environ["THRESHOLD"] = "0.01"
-    os.environ["MAX_ACTIONS_PER_BOARD"] = "50"
-    os.environ["BOARDs_PER_EPOCH"] = "10"
-    os.environ["LEARNING_RATE"] = "0.001"
+    #os.environ["THRESHOLD"] = "0.01"
+    #os.environ["MAX_ACTIONS_PER_BOARD"] = "50"
+    #os.environ["BOARDs_PER_EPOCH"] = "10"
+    #os.environ["LEARNING_RATE"] = "0.001"
 
     # load model or create new one if no model has been created
     try:
