@@ -18,4 +18,3 @@ for %%f in %folders% do (
         echo Folder does not exist: %%~f
     )
 )
-pause
