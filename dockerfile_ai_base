@@ -4,9 +4,12 @@ FROM python:3.9-slim
 # Set working directory inside the container
 WORKDIR /app
 
+# Install Python dependencies if you have a requirements.txt
+COPY ai_requirements.txt .
+RUN pip install -r ai_requirements.txt
+
 # Copy your source code into the container
-COPY src/factors/ ./src/factors/
-COPY src/params.py ./src/params.py
+COPY src/baseEnvironment.py ./src/baseEnvironment.py
 COPY src/globals.py ./src/globals.py
 COPY src/stockfish.py ./src/stockfish.py
 COPY src/inputProcessing.py ./src/inputProcessing.py

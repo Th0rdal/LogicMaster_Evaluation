@@ -1,10 +1,5 @@
 FROM ai_base
 
-
-# Install Python dependencies if you have a requirements.txt
-COPY ai_requirements.txt .
-RUN pip install -r ai_requirements.txt
-
 # Copy your source code into the container
 COPY src/qLearning/qLearning.py ./qLearning.py
 
