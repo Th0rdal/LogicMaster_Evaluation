@@ -3,6 +3,7 @@ import time
 import logging
 
 from src.exceptions.StopSignalSentException import StopSignalSentException
+from src.globals import STOP_ITERATING_SIGN
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,8 @@ class InputProcessor:
         with open(self.currentPath) as file:
             for line in file:
                 l = line.strip()
-                if l == "!STOP!":
-                    logging.info("Stop signal sent!")
+                if l == STOP_ITERATING_SIGN:
+                    logging.info("Sending stop signal to AI environment!")
                     raise StopSignalSentException("Stop signal sent!")
                 else:
                     yield l

@@ -5,7 +5,7 @@ import time
 
 import chess
 import chess.pgn
-from globals import PGN_FILE, PGN_PATH
+from globals import PGN_FILE, STOP_ITERATING_SIGN
 from src.stockfish import getExpectedResult
 
 def afterProcessFile(fenList, counter):
@@ -83,6 +83,7 @@ def extractGames(file, gamesPerFile, amountOfFilesToCreate, filesAlreadyCreated=
                 randomFen = random.choice(positions)
                 output.append(str(randomFen))
             count += 1
+
     return 0
 
 if __name__ == "__main__":
@@ -113,5 +114,15 @@ if __name__ == "__main__":
                 continue
 
     filesLeft = extractGames(PGN_FILE, 10, testFilesNeeded + trainingFilesNeeded + largestNumber, largestNumber)
+
+    while len(processes) > 0:
+        for process in processes[:]:  # Iterate over a copy of the list
+            if not process.is_alive():  # Check if the process has finished
+                process.join()  # Ensure the process has completely terminated
+                processes.remove(process)  # Remove the completed process
+
+    with open(os.getenv("BASE_PATH") + f"testing/{testingFilesCreated}", "a") as file:
+        file.write(STOP_ITERATING_SIGN)
+
     if filesLeft > 0: # replace with getting a new file
         raise Exception("There are " + str(filesLeft) + " files left.")
