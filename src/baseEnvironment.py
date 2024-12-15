@@ -32,8 +32,8 @@ class BaseEnvironment(gym.Env):
         # create observation space. It defines the state space that the environment provides to the agent.
         # Each param is constrained between -10 and 10 with a possible error of -inf to inf.
         self.observation_space = spaces.Box(
-            low = np.array([-10] * 2 + [-float('inf')] + [0] * 8),
-            high = np.array([10] * 2 + [float('inf')] + [2 ** 63] * 8),
+            low = np.array([0] * 8),
+            high = np.array([2 ** 63] * 8),
             dtype = np.float64
         )
 
@@ -73,8 +73,7 @@ class BaseEnvironment(gym.Env):
         self.stepChanges["error"] = self.current_error
         self.stepChanges["reward"] = reward
 
-        observation = np.array(
-            [actualResult, self.expected_output, self.current_error,
+        observation = np.array([
              self.input.occupied_co[chess.WHITE],
              self.input.occupied_co[chess.BLACK],
              self.input.pawns,
@@ -116,7 +115,7 @@ class BaseEnvironment(gym.Env):
 
         self.loadNewInput()
 
-        return np.array([0] * 11)
+        return np.array([0] * 8)
 
     def loadNewInput(self):
         """
@@ -171,7 +170,7 @@ class BaseEnvironment(gym.Env):
         logger.info("Starting testing!")
         logger.info(f"Episode {self.inputProcessor.index}")
 
-        self.ai.getInput("testing")
+        self.getInput("testing")
         results = []
         self.input = None
 
@@ -179,13 +178,34 @@ class BaseEnvironment(gym.Env):
             testInfo = {}
             try:
                 line = next(self.inputGenerator).split(":")
+                if line is None:
+                    break
             except StopIteration:
                 break
+            except StopSignalSentException as e:
+                logger.info(f"test results:")
+                for element in results:
+                    logger.info(f"\t{element}")
+                raise e #reraise, because AI loop needs it. Only done so logging can be done
 
             self.input = chess.Board(line[0])
             self.expected_output = float(line[1])
-            result = 4#self.target_function(self.input)
-            testInfo["actualResult"] = result
+
+            observation = np.array([
+                 self.input.occupied_co[chess.WHITE],
+                 self.input.occupied_co[chess.BLACK],
+                 self.input.pawns,
+                 self.input.knights,
+                 self.input.bishops,
+                 self.input.rooks,
+                 self.input.queens,
+                 self.input.kings
+            ])
+            result = self.model.predict(observation, deterministic=True)
+
+            testInfo["input"] = self.input
+            testInfo["actualResult"] = result[0]
+            testInfo["expectedResult"] = self.expected_output
             results.append(testInfo)
 
         logger.info(f"test results:")
@@ -222,11 +242,11 @@ class BaseEnvironment(gym.Env):
             except StopSignalSentException as e:
                 logger.info(e)
                 break
-            #except Exception as e:
-                #logger.error(f"Error {e}")
-                #logger.info(f"Input: {self.ai.inputChanges}")
-                #logger.info(f"Episode: {self.ai.episodeChangesDone}")
-                #break
+            except Exception as e:
+                logger.error(f"Error {e}")
+                logger.info(f"Input: {self.ai.inputChanges}")
+                logger.info(f"Episode: {self.ai.episodeChangesDone}")
+                break
         self.model.save(self.modelPath)
         with open("/app/model/ai.pkl", "wb") as f:
             self.inputGenerator = None
