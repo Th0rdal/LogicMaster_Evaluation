@@ -1,0 +1,24 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY preProcessing_requirements.txt .
+RUN pip install -r preProcessing_requirements.txt
+
+RUN apt-get update && apt-get install -y tar
+# add stockfish for calculating expected result
+COPY src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar
+
+RUN tar -xvf ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar \
+    && chmod +x ./stockfish/stockfish-ubuntu-x86-64-avx2 \
+    && rm ./src/stockfish17/stockfish-ubuntu-x86-64-avx2.tar
+
+ENV STOCKFISH_PATH=/app/stockfish/stockfish-ubuntu-x86-64-avx2
+ENV BASE_PATH=/app/resources/
+ENV PYTHONPATH=/app/src/
+
+COPY src/preProcessing.py ./src/preProcessing.py
+COPY src/stockfish.py ./src/stockfish.py
+COPY src/globals.py ./src/globals.py
+
+CMD ["python", "-m", "preProcessing"]

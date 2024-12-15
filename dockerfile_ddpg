@@ -1,0 +1,7 @@
+FROM ai_base
+
+# Copy your source code into the container
+COPY src/ddpg/ddpg.py ./ddpg.py
+
+# Command to run your Python AI program
+CMD ["python", "-m", "ddpg"]

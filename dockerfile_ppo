@@ -1,0 +1,7 @@
+FROM ai_base
+
+# Copy your source code into the container
+COPY src/ppo/ppo.py ./ppo.py
+
+# Command to run your Python AI program
+CMD ["python", "-m", "ppo"]

@@ -1,0 +1,5 @@
+chess==1.0.0
+stable-baselines3
+numpy
+gym
+shimmy
