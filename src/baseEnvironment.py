@@ -62,8 +62,7 @@ class BaseEnvironment(gym.Env):
         if type(action) == np.ndarray:
             action = action[0]
 
-        delta = (action - self.amountOfOptions)
-        actualResult = delta * self.metadata["learning_rate"]
+        actualResult = (action - self.amountOfOptions)
         self.stepChanges["actualResult"] = actualResult
 
         #calculate error and reward
