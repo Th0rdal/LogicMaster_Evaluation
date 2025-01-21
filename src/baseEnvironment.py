@@ -185,7 +185,7 @@ class BaseEnvironment(gym.Env):
                 logger.info(f"test results:")
                 for element in results:
                     logger.info(f"\t{element}")
-                raise e #reraise, because AI loop needs it. Only done so logging can be done
+                raise e #reraise, because AI loop needs it. Only caught so logging can be done
 
             self.input = chess.Board(line[0])
             self.expected_output = float(line[1])
@@ -200,7 +200,7 @@ class BaseEnvironment(gym.Env):
                  self.input.queens,
                  self.input.kings
             ])
-            result = self.model.predict(observation, deterministic=True)
+            result = self.model.predict(observation, deterministic=True)[0].item()
 
             testInfo["input"] = self.input
             testInfo["actualResult"] = result[0]
