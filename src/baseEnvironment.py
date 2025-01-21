@@ -47,6 +47,9 @@ class BaseEnvironment(gym.Env):
         self.model = None
         self.modelPath = ""
 
+    def convertActionToEvaluation(self, action):
+        return (action - self.amountOfOptions) / (self.amountOfOptions / 10)
+
     def step(self, action):
         """
         This is a single step taken during training. A step is a single action taken by the AI.
@@ -57,13 +60,14 @@ class BaseEnvironment(gym.Env):
         @return: observation, reward, done, info (defined by the model)
         """
         self.stepChanges = {}
-        self.stepChanges = {"action": action}
 
-        if type(action) == np.ndarray:
-            action = action[0]
+        if isinstance(action, np.ndarray):
+            action = action.item()
+            actualResult = action
+        else:
+            actualResult = self.convertActionToEvaluation(action)
 
-        actualResult = (action - self.amountOfOptions)
-        self.stepChanges["actualResult"] = actualResult
+        self.stepChanges = {"action": action, "actualResult": actualResult}
 
         #calculate error and reward
         self.current_error = abs(self.expected_output - actualResult)
@@ -73,14 +77,14 @@ class BaseEnvironment(gym.Env):
         self.stepChanges["reward"] = reward
 
         observation = np.array([
-             self.input.occupied_co[chess.WHITE],
-             self.input.occupied_co[chess.BLACK],
-             self.input.pawns,
-             self.input.knights,
-             self.input.bishops,
-             self.input.rooks,
-             self.input.queens,
-             self.input.kings
+            self.input.occupied_co[chess.WHITE],
+            self.input.occupied_co[chess.BLACK],
+            self.input.pawns,
+            self.input.knights,
+            self.input.bishops,
+            self.input.rooks,
+            self.input.queens,
+            self.input.kings
         ])
         self.stepChanges["observation"] = observation
 
@@ -200,10 +204,12 @@ class BaseEnvironment(gym.Env):
                  self.input.queens,
                  self.input.kings
             ])
-            result = self.model.predict(observation, deterministic=True)[0].item()
+            action = self.model.predict(observation, deterministic=True)[0].item()
+            evaluation = self.convertActionToEvaluation(action)
 
             testInfo["input"] = self.input
-            testInfo["actualResult"] = result[0]
+            testInfo["action"] = action
+            testInfo["actualResult"] = evaluation
             testInfo["expectedResult"] = self.expected_output
             results.append(testInfo)
 
