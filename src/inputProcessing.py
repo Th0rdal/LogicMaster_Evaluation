@@ -12,7 +12,7 @@ class InputProcessor:
     basePath = "/app/resources/" if not os.environ.get("debug") else "../../resources/"
     currentFile = ""
     index = 1
-    boardCounter = 0 # counts how many boards of the current set have been "given out" already
+    boardCounter = {"testing" : 0, "training" : 0} # counts how many boards of the current set have been "given out" already
     currentPath = ""
     currentBoardType = None
 
@@ -35,7 +35,7 @@ class InputProcessor:
                     raise StopSignalSentException("Stop signal sent!")
                 else:
                     yield l
-                self.boardCounter += 1
+                self.boardCounter[self.currentBoardType] += 1
         return None
 
     def loadNextSet(self, boardType):
@@ -49,3 +49,6 @@ class InputProcessor:
         self.currentBoardType = boardType
         if boardType == "testing":
             self.index += 1
+
+    def getBoardCount(self):
+        return self.boardCounter[self.currentBoardType]

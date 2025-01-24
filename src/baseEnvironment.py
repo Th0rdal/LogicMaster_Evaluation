@@ -94,7 +94,7 @@ class BaseEnvironment(gym.Env):
         self.currentActionCount += 1
         self.inputChanges["steps"].append(copy.deepcopy(self.stepChanges))
         if self.currentActionCount == self.metadata["maxActionsPerBoard"]:
-            logger.info(f"Board {self.inputProcessor.boardCounter} ({self.inputProcessor.currentBoardType}) results: {self.inputChanges}")
+            logger.info(f"Board {self.inputProcessor.getBoardCount()} ({self.inputProcessor.currentBoardType}) results: {self.inputChanges}")
             self.episodeChangesDone.append(copy.deepcopy(self.inputProcessor.boardCounter))
             done = self.loadNewInput()
             if done:
@@ -174,8 +174,9 @@ class BaseEnvironment(gym.Env):
         logger.info(f"Episode {self.inputProcessor.index}")
 
         self.getInput("testing")
-        results = []
         self.input = None
+
+        logger.info(f"test results:")
 
         while True:
             testInfo = {}
@@ -185,11 +186,6 @@ class BaseEnvironment(gym.Env):
                     break
             except StopIteration:
                 break
-            except StopSignalSentException as e:
-                logger.info(f"test results:")
-                for element in results:
-                    logger.info(f"\t{element}")
-                raise e #reraise, because AI loop needs it. Only caught so logging can be done
 
             self.input = chess.Board(line[0])
             self.expected_output = float(line[1])
@@ -211,11 +207,8 @@ class BaseEnvironment(gym.Env):
             testInfo["action"] = action
             testInfo["actualResult"] = evaluation
             testInfo["expectedResult"] = self.expected_output
-            results.append(testInfo)
 
-        logger.info(f"test results:")
-        for element in results:
-            logger.info(f"\t{element}")
+            logger.info(f"Board {self.inputProcessor.getBoardCount()} {testInfo}")
 
     def loadEnvVars(self):
         """
